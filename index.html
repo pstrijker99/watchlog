@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Watchlog</title>
-<meta name="version" content="alpha 0.0.3">
+<meta name="version" content="alpha 0.0.4">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -166,10 +166,12 @@ button:disabled{opacity:.5}
 #scroller{display:contents}
 #pHead,#pBar{display:none}
 :root[data-layout=phone] #scroller{display:block;flex:1;overflow-y:auto;overscroll-behavior:contain;min-height:0}
-:root[data-layout=phone] .list{overflow:visible;flex:none;padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+:root[data-layout=phone] .list{overflow:visible;flex:none;padding-bottom:calc(var(--pbh,240px) + 16px)}
 :root[data-layout=phone] #side{display:none}
-:root[data-layout=phone] #pHead{display:block;padding-top:8px}
-:root[data-layout=phone] #pHead .logo{padding:18px 16px 14px;font-size:30px}
+:root[data-layout=phone] #pHead{display:block;padding-top:calc(12px + env(safe-area-inset-top))}
+#pBar .logo{font-size:22px;padding:2px 0 0;flex:none}
+#pBar .chips{margin:0 -16px;padding:0 16px}
+#pBar .chips.sub{margin-top:-2px}
 :root[data-layout=phone] #pBar{display:flex;flex-direction:column;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
   background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);
   transition:transform .25s cubic-bezier(.2,.8,.2,1)}
@@ -182,7 +184,7 @@ button:disabled{opacity:.5}
 #pBar .seg{flex:none}
 .selecting #pBar{display:none!important}
 :root[data-layout=phone] #q::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
-:root[data-layout=phone] .toast{bottom:calc(140px + env(safe-area-inset-bottom))}
+:root[data-layout=phone] .toast{bottom:calc(var(--pbh,240px) + 12px)}
 :root[data-layout=phone] #pBar.away~.toast{bottom:calc(24px + env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){#pBar{transition:none}}
 
@@ -675,7 +677,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const VERSION='alpha 0.0.3';
+const VERSION='alpha 0.0.4';
 const IMG='https://image.tmdb.org/t/p/';
 /* built-in keys (scrambled only to keep them off screen; not secret) */
 const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
@@ -1314,9 +1316,9 @@ function applyLayout(){
 function placeControls(L){
   const logo=document.querySelector('.logo'),topA=$('#topA'),topB=$('#topB'),bar=document.querySelector('.bar'),side=$('#side'),pRow=$('#pRow'),pBar=$('#pBar'),pHead=$('#pHead');
   if(L==='phone'){
-    pHead.append(logo,$('#gChips'),$('#sChips'),$('#note'));
+    pHead.append($('#note'));
     pRow.prepend($('#bSearch'),$('#bSet'),$('#bSort'));pRow.append($('#bAdd'));
-    pBar.append(topB,$('#kindSeg'));
+    pBar.append(logo,$('#gChips'),$('#sChips'),pRow,topB,$('#kindSeg'));
   }else{
     topA.prepend(logo);topA.append($('#bSearch'),$('#bSet'),$('#bAdd'));
     bar.append($('#kindSeg'),$('#bSort'));
@@ -1325,6 +1327,7 @@ function placeControls(L){
   pBar.classList.toggle('searching',!topB.hidden)}
 const scrollBox=()=>layout==='phone'?$('#scroller'):$('#list');
 let lastY=0;
+new ResizeObserver(()=>{const h=$('#pBar').offsetHeight;if(h)document.documentElement.style.setProperty('--pbh',h+'px')}).observe($('#pBar'));
 $('#scroller').addEventListener('scroll',()=>{if(layout!=='phone')return;const y=$('#scroller').scrollTop,d=y-lastY,b=$('#pBar');
   if(b.classList.contains('searching')){lastY=y;return}
   if(y<40||d<-6)b.classList.remove('away');else if(d>6)b.classList.add('away');
