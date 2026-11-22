@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Watchlog</title>
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: quiet, exact, a little playful — a Nothing phone app.
+   IDEA: the Glyph / dot-matrix display: every poster is re-drawn as halftone dots.
+   PICTURE: the list of dot tiles; the 10-dot rating bar in the editor.
+   COLOUR and TYPE: pure black or paper white, ink, one Nothing red; Doto for numbers and labels, Space Grotesk for text.
+   LAYOUT: one fixed phone screen, no page scroll; only the list scrolls; sheets slide over. */
+:root{color-scheme:light dark;--bg:light-dark(#efefed,#000);--card:light-dark(#fff,#0e0e0e);--ink:light-dark(#0b0b0b,#f4f4f4);--mute:light-dark(#74747a,#8c8c8c);--dim:light-dark(#d3d3d0,#2a2a2a);--line:light-dark(#e0e0dc,#1d1d1d);--red:#d71921;--dot:'Doto',ui-monospace,monospace;--sans:'Space Grotesk',system-ui,sans-serif}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 var(--sans);overflow:hidden;overscroll-behavior:none}
+button,input,textarea{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+button:disabled{opacity:.5}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.app{height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;padding-top:env(safe-area-inset-top)}
+.top{display:flex;align-items:center;gap:4px;padding:14px 16px 12px;min-height:60px}
+.logo{font:900 30px/1 var(--dot);letter-spacing:.02em;margin:0;flex:1}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;flex:none}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.add{width:44px;height:44px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;margin-left:4px;flex:none}
+.add svg{width:20px;height:20px;stroke:#fff;stroke-width:2.4}
+.sbar{display:flex;flex:1}
+.sbar input{flex:1;height:44px;border:0;border-bottom:1.5px solid var(--ink);background:none;font-size:18px;padding:0 2px;outline:0}
+.bar{display:flex;gap:8px;align-items:center;padding:0 16px 10px}
+.seg{display:flex;background:var(--card);border-radius:22px;padding:3px;flex:1}
+.seg button{flex:1;height:36px;border-radius:18px;font-size:14px;font-weight:500;color:var(--mute)}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.sort{height:42px;padding:0 14px;border-radius:21px;background:var(--card);font:700 14px var(--dot);text-transform:uppercase;white-space:nowrap}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;flex:none}
+.chips::-webkit-scrollbar{display:none}
+.chips:empty{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:17px;border:1.5px solid var(--dim);font-size:14px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chips.sub .chip{height:30px;font-size:13px;border-style:dashed}
+.chips.sub .chip.on{border-style:solid;background:var(--red);border-color:var(--red);color:#fff}
+.chip i{font:700 12px var(--dot);font-style:normal;margin-left:4px;color:var(--red)}
+.note{font-size:13px;color:var(--mute);padding:0 16px 8px}.note:empty{display:none}
+.list{flex:1;overflow-y:auto;padding:0 16px calc(16px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:8px 0;border-bottom:1px solid var(--line)}
+.row .pm{width:44px;flex:none}
+.rt{flex:1;display:flex;flex-direction:column;gap:2px}
+.rt b{font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt small{font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt small em{font-style:normal;color:var(--red)}
+.sc{font:900 32px/1 var(--dot);width:46px;text-align:right;flex:none}
+.sc.no{color:var(--dim)}
+.pm{display:block;aspect-ratio:2/3;border-radius:6px;background-color:var(--card);background-image:radial-gradient(circle,var(--dim) 30%,transparent 36%);background-size:10% calc(100%/15);overflow:hidden;position:relative}
+.pm svg,.pm img{display:block;width:100%;height:100%;fill:var(--ink);object-fit:cover}
+.pm.ht{background:#000}.pm.ht svg{fill:#f4f4f4}.pm.ht .z{fill:#262626}
+.pm.ph{background:var(--card)}
+.pm .rd{fill:var(--red)}
+.pm .live{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red)}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:var(--mute);padding:0 24px 40px}
+.empty .pm{width:84px}
+.btn{height:48px;padding:0 24px;border-radius:24px;background:var(--red);color:#fff;font-weight:700;font-size:16px;flex:none}
+.btn.ink{background:var(--ink);color:var(--bg)}
+.btn.sm{height:40px;padding:0 20px}
+.btn.line{background:none;color:var(--ink);border:1.5px solid var(--dim)}
+.ghost{height:44px;padding:0 6px;font-size:15px;color:var(--mute);font-weight:500}
+/* overlays */
+.ov{position:fixed;inset:0;background:var(--bg);display:flex;justify-content:center;transform:translateY(100%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s;z-index:10}
+.ov.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.pane{width:100%;max-width:520px;height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+.ph{display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:8px}
+.ph h2{font:900 22px var(--dot);margin:0;text-transform:uppercase}
+.find{display:flex;gap:8px;padding:4px 0 6px}
+.find input{flex:1;height:52px;border:0;border-bottom:1.5px solid var(--ink);background:none;font-size:20px;outline:0;padding:0 2px}
+.hint{font-size:13px;color:var(--mute);margin:4px 0 12px}
+.res{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:12px}
+.rc{display:flex;gap:12px;text-align:left;background:var(--card);border-radius:16px;padding:10px;width:100%;align-items:flex-start}
+.rc .pm{width:52px;flex:none;background-color:var(--bg)}
+.rc b{display:block;font-size:17px;font-weight:500}
+.rc small{display:block;font-size:13px;color:var(--mute)}
+.rc p{margin:4px 0 0;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rc .tag{font:700 12px var(--dot);color:var(--red);text-transform:uppercase}
+.rc.busy{opacity:.5}
+.load{display:flex;gap:7px;justify-content:center;padding:36px 0}
+.load span{width:9px;height:9px;border-radius:50%;background:var(--dim);animation:pl 1.1s infinite}
+.load span:nth-child(2){animation-delay:.1s}.load span:nth-child(3){animation-delay:.2s}.load span:nth-child(4){animation-delay:.3s}.load span:nth-child(5){animation-delay:.4s}.load span:nth-child(6){animation-delay:.5s}.load span:nth-child(7){animation-delay:.6s}
+@keyframes pl{0%,60%,100%{background:var(--dim)}20%{background:var(--red)}}
+@media (prefers-reduced-motion:reduce){.load span{animation:none}.ov,.ov.open{transition:none}}
+.msg{color:var(--mute);text-align:center;padding:28px 8px;font-size:15px}
+/* editor */
+.ed{flex:1;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-bottom:8px}
+.hero{display:flex;gap:14px;align-items:flex-start}
+.hero .pm{width:84px;flex:none}
+.hero h3{font-size:22px;line-height:1.12;margin:0 0 4px;font-weight:700;text-wrap:balance}
+.hero .mt{font:700 14px var(--dot);color:var(--mute);text-transform:uppercase;margin:0}
+.hero .im{font:700 14px var(--dot);margin:6px 0 0;display:flex;align-items:center;gap:6px}.hero .im b{font-size:18px;font-weight:900}.hero .im span{color:var(--mute)}
+.hero .cr{font-size:14px;margin:4px 0 0;color:var(--mute)}
+.syn{font-size:14px;margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.syn.full{-webkit-line-clamp:unset;display:block}
+.edl{font-size:13px;color:var(--red);font-weight:700;margin-top:6px;height:28px}
+.lbl{display:flex;justify-content:space-between;align-items:baseline;font:700 13px var(--dot);color:var(--mute);text-transform:uppercase;margin-bottom:8px}
+.score{font:900 34px/1 var(--dot);color:var(--ink)}
+.score small{font-size:16px;color:var(--mute)}
+.rate{display:flex;justify-content:space-between;align-items:center;height:44px}
+.rate button{flex:none;width:28px;height:28px;border-radius:50%;background:var(--dim);transition:background .15s}
+.rate button.on{background:var(--ink)}
+.rate button.on.hi{background:var(--red)}
+.date{height:32px;border:0;background:none;padding:0;font:700 14px var(--dot);color:var(--ink);text-align:right;margin:-8px 0}
+.cats{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;text-align:left;width:100%}
+.cats .chip{border-style:dashed}
+.cats .chip.g{border-style:solid;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cats .chip.add2{color:var(--red);border-color:var(--red)}
+.th{flex:1;display:flex;flex-direction:column;min-height:140px}
+.th textarea{flex:1;width:100%;border:0;border-radius:16px;background:var(--card);padding:14px;font-size:16px;line-height:1.5;resize:none;outline:0}
+.ft{display:flex;justify-content:space-between;align-items:center;min-height:52px}
+.ft a{color:var(--mute);font-size:15px;font-weight:500;text-decoration:none;height:44px;display:flex;align-items:center}
+.del.arm{color:var(--red)}
+/* sheets */
+.sh{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;background:rgb(0 0 0/.5);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s .2s}
+.sh.open{opacity:1;visibility:visible;transition:opacity .2s}
+.sp{width:100%;max-width:520px;max-height:88dvh;background:var(--bg);border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding:4px 16px calc(12px + env(safe-area-inset-bottom))}
+.sp .chips{margin:0 -16px;padding:0 16px 12px}
+.subs{display:flex;flex-wrap:wrap;gap:8px;overflow-y:auto;padding-bottom:12px;align-content:flex-start}
+.tog{height:38px;padding:0 14px;border-radius:19px;background:var(--card);font-size:14px;font-weight:500}
+.tog.on{background:var(--red);color:#fff}
+.tog.gen{border:1.5px solid var(--ink);background:none}
+.tog.gen.on{background:var(--ink);color:var(--bg)}
+.form{display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font:700 12px var(--dot);color:var(--mute);text-transform:uppercase}
+.form input,.form textarea{font:400 16px var(--sans);color:var(--ink);background:var(--card);border:0;border-radius:12px;padding:11px 12px;outline:0;text-transform:none}
+.form textarea{resize:none;height:76px}
+.form label .seg button{font:500 14px var(--sans);text-transform:none}
+.form .r2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.form p{margin:0;font-size:13px;color:var(--mute)}
+.form p a{color:var(--ink)}
+.form .row2{display:flex;gap:8px;align-items:center}
+.form .row2 .btn{flex:1}
+.ok{color:var(--ink)}.bad{color:var(--red)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:.25s;z-index:40;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top" id="topA">
+    <h1 class="logo">WATCHLOG</h1>
+    <button class="ib" id="bSearch" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></button>
+    <button class="ib" id="bSet" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+    <button class="add" id="bAdd" aria-label="Add title"><svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></svg></button>
+  </header>
+  <header class="top" id="topB" hidden>
+    <div class="sbar"><input id="q" type="search" placeholder="Search your log" autocomplete="off"></div>
+    <button class="ib" id="bSearchX" aria-label="Close search"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </header>
+  <div class="bar">
+    <div class="seg" id="kindSeg"><button data-k="all" class="on">All</button><button data-k="film">Film</button><button data-k="series">Series</button><button data-k="queue">Queue</button></div>
+    <button class="sort" id="bSort">Recent</button>
+  </div>
+  <div class="chips" id="gChips"></div>
+  <div class="chips sub" id="sChips"></div>
+  <div class="note" id="note"></div>
+  <main class="list" id="list"></main>
+</div>
+
+<section class="ov" id="ovAdd" aria-label="Add title">
+  <div class="pane">
+    <div class="ph"><h2>Add</h2><button class="ib" data-close="ovAdd" aria-label="Close"><svg viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:1.8;fill:none"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <form class="find" id="fFind"><input id="fq" placeholder="Title, e.g. Arrival 2016" autocomplete="off" enterkeyhint="search"><button class="btn" id="bFind">Find</button></form>
+    <p class="hint" id="fHint">Searches TMDB for films and series. Add a year to narrow it down.</p>
+    <div class="res" id="res"></div>
+    <div class="ft"><span></span><button class="ghost" id="bManual">Enter manually →</button></div>
+  </div>
+</section>
+
+<section class="ov" id="ovEd" aria-label="Edit title">
+  <div class="pane">
+    <div class="ph"><button class="ghost" id="bEdX">Close</button><button class="btn ink sm" id="bSave">Save</button></div>
+    <div class="ed">
+      <div class="hero" id="eHero"></div>
+      <div>
+        <div class="lbl"><span>Rating</span><span class="score" id="eScore"></span></div>
+        <div class="rate" id="eRate"></div>
+      </div>
+      <div>
+        <div class="lbl"><span>Status</span><input type="date" class="date" id="eDate" aria-label="Date watched"></div>
+        <div class="seg" id="eStat"><button data-s="watched">Watched</button><button data-s="watching">Watching</button><button data-s="want">Want</button></div>
+      </div>
+      <div>
+        <div class="lbl"><span>Categories</span></div>
+        <button class="cats" id="eCats"></button>
+      </div>
+      <div class="th">
+        <div class="lbl"><span>Thoughts</span></div>
+        <textarea id="eTh" placeholder="What stayed with you?"></textarea>
+      </div>
+    </div>
+    <div class="ft"><a id="eImdb" href="#" target="_blank" rel="noopener">IMDb ↗</a><button class="ghost del" id="bDel">Delete</button></div>
+  </div>
+</section>
+
+<div class="sh" id="shCat">
+  <div class="sp">
+    <div class="ph"><h2>Categories</h2><button class="btn ink sm" data-closesh="shCat">Done</button></div>
+    <div class="chips" id="cTabs"></div>
+    <div class="subs" id="cSubs"></div>
+  </div>
+</div>
+
+<div class="sh" id="shDet">
+  <div class="sp">
+    <div class="ph"><h2>Details</h2><button class="btn ink sm" id="bDetOk">Done</button></div>
+    <form class="form" id="fDet">
+      <label>Title<input id="dT"></label>
+      <div class="r2"><label>Year<input id="dY" inputmode="numeric" maxlength="4"></label>
+        <label>Type<div class="seg" id="dK"><button type="button" data-k="film">Film</button><button type="button" data-k="series">Series</button></div></label></div>
+      <div class="r2"><label id="dCL">Director<input id="dC"></label><label id="dRL">Minutes<input id="dR" inputmode="numeric"></label></div>
+      <label>Cast<input id="dA" placeholder="Comma separated"></label>
+      <label>Synopsis<textarea id="dS"></textarea></label>
+    </form>
+  </div>
+</div>
+
+<div class="sh" id="shSet">
+  <div class="sp">
+    <div class="ph"><h2>Settings</h2><button class="btn ink sm" data-closesh="shSet">Done</button></div>
+    <div class="form">
+      <label>TMDB key<input id="sKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="API key or Read Access Token"></label>
+      <div class="row2"><button class="btn line sm" id="bTest">Check key</button><span id="sKeyMsg" style="font-size:14px"></span></div>
+      <p>Free at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">themoviedb.org → Settings → API</a>. Either the API key or the Read Access Token works. It stays on this phone.</p>
+      <label>OMDb key (IMDb rating)<input id="sOmdb" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Optional"></label>
+      <div class="row2"><button class="btn line sm" id="bTestO">Check key</button><span id="sOmdbMsg" style="font-size:14px"></span></div>
+      <p>Free at <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com → API Key</a> (the free plan, confirmed by email). Adds the IMDb rating to titles you look up.</p>
+      <label>Posters<div class="seg" id="sPost"><button type="button" data-p="dot">Dot matrix</button><button type="button" data-p="photo">Photo</button></div></label>
+      <label>Cloud backup (GitHub)<input id="sGh" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="GitHub token with gist access"></label>
+      <div class="row2"><button class="btn line sm" id="bSync">Back up now</button><button class="btn line sm" id="bRest">Restore</button></div>
+      <p id="sSync"></p>
+      <p>Saves your whole log to a private gist on your GitHub account after every change. On a new phone, install the app, paste the same token and tap Restore. Create the token at <a href="https://github.com/settings/tokens/new?scopes=gist&description=Watchlog" target="_blank" rel="noopener">github.com → Settings → Tokens</a>: tick only “gist” and set expiration to “No expiration”.</p>
+      <label>File backup</label>
+      <div class="row2"><button class="btn line sm" id="bExp">Export</button><button class="btn line sm" id="bImp">Import</button></div>
+      <input type="file" id="fImp" accept="application/json,.json" hidden>
+      <p id="sCount"></p>
+      <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Film data and posters © TMDB.</p>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const TAX=[
+ {id:'scifi',n:'Sci-Fi',s:['Space Opera','Hard SF','Cyberpunk','Time Travel','First Contact','Alien Invasion','AI & Robots','Dystopian','Post-Apocalyptic','Space Exploration','Military SF','Biopunk','Simulation & VR','Mind-Bending','Alternate History','Clones & Identity','Climate Fiction','Solarpunk','Retro-Futurism','Space Western','Steampunk','Kaiju','Superhero','Survival']},
+ {id:'drama',n:'Drama',s:['Character Study','Period','Political','Legal','Medical','Coming-of-Age','Family','Sports','Biopic','Workplace']},
+ {id:'thriller',n:'Thriller',s:['Psychological','Spy','Conspiracy','Techno-Thriller','Survival','Revenge','Political']},
+ {id:'crime',n:'Crime',s:['Detective','Noir & Neo-Noir','Gangster','Heist','Procedural','Courtroom','True Story']},
+ {id:'mystery',n:'Mystery',s:['Whodunit','Puzzle Box','Supernatural','Cold Case']},
+ {id:'horror',n:'Horror',s:['Cosmic','Supernatural','Slasher','Folk','Body Horror','Psychological','Found Footage','Zombie','Creature','Sci-Fi Horror']},
+ {id:'fantasy',n:'Fantasy',s:['Epic','Dark','Urban','Sword & Sorcery','Fairy Tale','Mythological','Portal','Magical Realism']},
+ {id:'action',n:'Action',s:['Martial Arts','Spy','Disaster','Buddy','Superhero','Car & Chase','One-Man Army']},
+ {id:'adventure',n:'Adventure',s:['Quest','Treasure Hunt','Survival','Swashbuckler','Exploration']},
+ {id:'comedy',n:'Comedy',s:['Romcom','Satire','Dark Comedy','Sitcom','Parody','Mockumentary','Absurdist','Workplace']},
+ {id:'romance',n:'Romance',s:['Romantic Drama','Period','Slow Burn','Tragic']},
+ {id:'animation',n:'Animation',s:['Anime','Mecha','Adult Animation','Family','Stop-Motion']},
+ {id:'docu',n:'Documentary',s:['Nature','Science & Space','History','True Crime','Music','Sports','Tech','Social Issue']},
+ {id:'war',n:'War',s:['WWII','WWI','Vietnam','Modern','Cold War','Anti-War']},
+ {id:'western',n:'Western',s:['Classic','Revisionist','Neo-Western','Spaghetti']}
+];
+/* keyword rules: TMDB keywords + overview are matched against these to suggest subcategories */
+const RX={
+ 'scifi.space-opera':/space opera|galactic|intergalactic|starship|space battle|empire/,'scifi.hard-sf':/hard science fiction|astronaut|space station|black hole|astrophysic|mars|nasa/,
+ 'scifi.cyberpunk':/cyberpunk|cyborg|hacker|transhuman|megacorporation/,'scifi.time-travel':/time travel|time loop|time machine|time paradox/,
+ 'scifi.first-contact':/first contact|alien contact|extraterrestrial (life|communication)|alien language/,'scifi.alien-invasion':/alien invasion|invasion/,
+ 'scifi.ai-and-robots':/artificial intelligence|\(a\.i\.\)|robot|android|sentient/,'scifi.dystopian':/dystopi|totalitarian|authoritarian|surveillance state/,
+ 'scifi.post-apocalyptic':/post-apocalyptic|apocalypse|nuclear war|wasteland|end of the world/,'scifi.space-exploration':/space travel|space exploration|spacecraft|space mission|outer space|spaceship/,
+ 'scifi.military-sf':/space marine|military|soldier|space war/,'scifi.biopunk':/genetic engineering|mutation|bioengineer|virus|pandemic/,
+ 'scifi.simulation-and-vr':/virtual reality|simulation|simulated reality|video game/,'scifi.mind-bending':/mind-bend|surreal|nonlinear|philosoph|existential|parallel (world|universe)|multiverse|dream/,
+ 'scifi.alternate-history':/alternate history|alternate timeline|alternate reality/,'scifi.clones-and-identity':/clone|cloning|identity|memory|amnesia/,
+ 'scifi.climate-fiction':/climate change|global warming|ecolog/,'scifi.solarpunk':/solarpunk/,'scifi.retro-futurism':/retro-futur|retrofutur/,
+ 'scifi.space-western':/space western/,'scifi.steampunk':/steampunk/,'scifi.kaiju':/kaiju|giant monster|godzilla/,'scifi.superhero':/superhero|based on comic|super power|superpower/,'scifi.survival':/survival|stranded/,
+ 'drama.character-study':/character study|loneliness|grief|midlife crisis/,'drama.period':/period (piece|drama)|19th century|18th century|victorian|historical/,
+ 'drama.political':/politic|election|government|president/,'drama.legal':/lawyer|courtroom|legal/,'drama.medical':/hospital|doctor|surgeon|medical|nurse/,
+ 'drama.coming-of-age':/coming of age|teenager|adolescence|high school/,'drama.family':/family relationships|dysfunctional family|family drama|siblings/,
+ 'drama.sports':/sport|boxing|football|baseball|basketball|racing|soccer/,'drama.biopic':/biography|biopic|based on true story/,'drama.workplace':/workplace|office/,
+ 'thriller.psychological':/psychological thriller|paranoia|obsession|manipulation/,'thriller.spy':/spy|espionage|\bcia\b|secret agent/,'thriller.conspiracy':/conspiracy|cover-up|corruption/,
+ 'thriller.techno-thriller':/hacker|cyber|surveillance|artificial intelligence/,'thriller.survival':/survival|stranded/,'thriller.revenge':/revenge|vengeance/,'thriller.political':/politic|assassination/,
+ 'crime.detective':/detective|investigation|private investigator/,'crime.noir-and-neo-noir':/noir|femme fatale/,'crime.gangster':/gangster|mafia|\bmob\b|organized crime|cartel/,
+ 'crime.heist':/heist|robbery/,'crime.procedural':/police procedural|police|\bfbi\b|forensic/,'crime.courtroom':/courtroom|trial|lawyer/,'crime.true-story':/true crime|based on true story|real events/,
+ 'mystery.whodunit':/whodunit|murder mystery|detective/,'mystery.puzzle-box':/puzzle|mystery box|nonlinear|mind-bend/,'mystery.supernatural':/supernatural|ghost|paranormal/,'mystery.cold-case':/cold case|missing person|disappearance/,
+ 'horror.cosmic':/lovecraft|cosmic horror|eldritch/,'horror.supernatural':/supernatural|ghost|haunt|demon|possession|witch/,'horror.slasher':/slasher|serial killer|masked killer/,
+ 'horror.folk':/folk horror|cult|pagan|ritual/,'horror.body-horror':/body horror|mutation|transformation|parasite/,'horror.psychological':/psychological horror|paranoia|madness|isolation/,
+ 'horror.found-footage':/found footage/,'horror.zombie':/zombie|undead/,'horror.creature':/monster|creature|shark/,'horror.sci-fi-horror':/alien|extraterrestrial|outer space|experiment/,
+ 'fantasy.epic':/epic fantasy|high fantasy|kingdom|dragon|quest/,'fantasy.dark':/dark fantasy|curse|demon/,'fantasy.urban':/urban fantasy|vampire|werewolf/,
+ 'fantasy.sword-and-sorcery':/sword and sorcery|sorcer|barbarian/,'fantasy.fairy-tale':/fairy tale|fable|princess/,'fantasy.mythological':/mytholog|greek god|norse/,
+ 'fantasy.portal':/portal|another world|parallel world|isekai/,'fantasy.magical-realism':/magical realism/,
+ 'action.martial-arts':/martial arts|kung fu|karate/,'action.spy':/spy|espionage|secret agent/,'action.disaster':/disaster|earthquake|tsunami|volcano|meteor/,'action.buddy':/buddy/,
+ 'action.superhero':/superhero|based on comic|marvel|dc comics/,'action.car-and-chase':/car chase|car race|street racing/,'action.one-man-army':/one man army|vigilante|assassin|hitman/,
+ 'adventure.quest':/quest|journey/,'adventure.treasure-hunt':/treasure|archaeolog/,'adventure.survival':/survival|wilderness|stranded/,'adventure.swashbuckler':/pirate|swashbuckl/,'adventure.exploration':/expedition|exploration|jungle/,
+ 'comedy.romcom':/romantic comedy/,'comedy.satire':/satire/,'comedy.dark-comedy':/dark comedy|black comedy|dark humor/,'comedy.sitcom':/sitcom/,'comedy.parody':/parody|spoof/,
+ 'comedy.mockumentary':/mockumentary/,'comedy.absurdist':/absurd/,'comedy.workplace':/workplace|office/,
+ 'romance.romantic-drama':/romantic drama|love affair|forbidden love/,'romance.period':/period (piece|drama)|victorian|regency|19th century/,'romance.slow-burn':/slow burn|friends to lovers/,'romance.tragic':/tragic|tragedy|terminal illness/,
+ 'animation.anime':/anime|based on manga/,'animation.mecha':/mecha|giant robot/,'animation.adult-animation':/adult animation/,'animation.family':/family|children/,'animation.stop-motion':/stop motion|claymation/,
+ 'docu.nature':/nature|wildlife|animal|ocean/,'docu.science-and-space':/science|outer space|universe|physics|astronomy/,'docu.history':/history|historical/,'docu.true-crime':/true crime|murder/,
+ 'docu.music':/music|musician|band|concert/,'docu.sports':/sport/,'docu.tech':/technology|internet|silicon valley|computer/,'docu.social-issue':/social|inequality|climate/,
+ 'war.wwii':/world war ii|wwii|nazi/,'war.wwi':/world war i\b|\bwwi\b/,'war.vietnam':/vietnam/,'war.modern':/iraq|afghanistan|modern warfare/,'war.cold-war':/cold war|soviet|\bkgb\b/,'war.anti-war':/anti-war/,
+ 'western.classic':/cowboy|frontier|gunslinger/,'western.revisionist':/revisionist/,'western.neo-western':/neo-western|modern western/,'western.spaghetti':/spaghetti western/
+};
+const TG={878:['scifi'],28:['action'],12:['adventure'],16:['animation'],35:['comedy'],80:['crime'],99:['docu'],18:['drama'],14:['fantasy'],27:['horror'],9648:['mystery'],10749:['romance'],53:['thriller'],10752:['war'],37:['western'],36:['drama'],10759:['action','adventure'],10768:['war']};
+const FANT=/magic|dragon|wizard|witch|fairy|sword|sorcer|mytholog|vampire|werewolf|kingdom|elves|elf\b/;
+const slug=s=>s.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const SUB={},GEN={};
+TAX.forEach(g=>{GEN[g.id]=g;g.subs=g.s.map(l=>{const id=g.id+'.'+slug(l);SUB[id]={id,l,g:g.id};return id})});
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const IMG='https://image.tmdb.org/t/p/';
+const LS='watchlog.items',LC='watchlog.cfg';
+let items=[],cfg={key:'',omdb:'',gh:'',gist:'',lastSync:0,dirty:false,posters:'dot'};
+const ui={kind:'all',sort:'recent',g:'',s:'',q:''};
+
+/* ---------- storage (this phone only) ---------- */
+function load(){try{items=JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){items=[]}try{cfg={...cfg,...JSON.parse(localStorage.getItem(LC)||'{}')}}catch(e){}}
+function persist(){try{localStorage.setItem(LS,JSON.stringify(items));return true}catch(e){toast('Phone storage is full');return false}}
+function saveCfg(){try{localStorage.setItem(LC,JSON.stringify(cfg))}catch(e){}}
+function upsert(t){items=items.filter(x=>x.id!==t.id).concat(t);persist();render();changed()}
+function removeItem(id){items=items.filter(x=>x.id!==id);persist();render();changed()}
+
+/* ---------- cloud backup: a private GitHub gist ---------- */
+const GH='https://api.github.com',GDESC='watchlog-backup',GFILE='watchlog.json';
+let syncT=null,syncing=false;
+function changed(){cfg.dirty=true;saveCfg();if(!cfg.gh)return;clearTimeout(syncT);syncT=setTimeout(()=>push().catch(()=>{}),4000)}
+async function gh(path,opt={}){
+  let r;try{r=await fetch(GH+path,{...opt,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+cfg.gh.trim(),...(opt.body?{'Content-Type':'application/json'}:{})}})}catch(e){throw{code:'offline'}}
+  if(r.status===401||r.status===403)throw{code:'auth'};if(r.status===404)throw{code:'missing'};if(!r.ok)throw{code:'http'};return r.json()}
+async function findGist(){
+  if(cfg.gist){try{return await gh('/gists/'+cfg.gist)}catch(e){if(e.code!=='missing')throw e;cfg.gist=''}}
+  for(let page=1;page<=5;page++){const list=await gh('/gists?per_page=100&page='+page);
+    const g=list.find(x=>x.description===GDESC&&x.files&&x.files[GFILE]);if(g){cfg.gist=g.id;saveCfg();return gh('/gists/'+g.id)}if(list.length<100)break}
+  return null}
+const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters},items:items.map(({dots,...t})=>t)});
+async function push(){
+  if(!cfg.gh||syncing)return;syncing=true;
+  try{if(!cfg.lastSync){const arr=await pull().catch(e=>{if(e.code==='none')return null;throw e});if(arr)merge(arr)}
+    const body={description:GDESC,files:{[GFILE]:{content:packed()}}};
+    if(!cfg.gist){const g=await findGist();if(!g){const c=await gh('/gists',{method:'POST',body:JSON.stringify({...body,public:false})});cfg.gist=c.id}}
+    if(cfg.gist)await gh('/gists/'+cfg.gist,{method:'PATCH',body:JSON.stringify(body)}).catch(async e=>{if(e.code!=='missing')throw e;const c=await gh('/gists',{method:'POST',body:JSON.stringify({...body,public:false})});cfg.gist=c.id});
+    cfg.lastSync=Date.now();cfg.dirty=false;saveCfg();syncMsg()}
+  catch(e){syncMsg(e.code);throw e}
+  finally{syncing=false}}
+async function pull(){
+  const g=await findGist();if(!g)throw{code:'none'};
+  const f=g.files[GFILE];let txt=f.content;
+  if(f.truncated&&f.raw_url){try{txt=await (await fetch(f.raw_url)).text()}catch(e){throw{code:'offline'}}}
+  const d=JSON.parse(txt);return Array.isArray(d.items)?d.items:[]}
+function merge(arr){let n=0;const byId=new Map(items.map(t=>[String(t.id),t]));
+  arr.forEach(t=>{if(!t||!t.id||!t.title)return;const id=String(t.id),mine=byId.get(id);
+    if(!mine||(t.updated||0)>(mine.updated||0)){byId.set(id,{...t,id,dots:mine&&mine.poster===t.poster?mine.dots:t.dots});n++}});
+  items=[...byId.values()];persist();render();fillDots();return n}
+const when=ts=>new Date(ts).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+function syncMsg(err){const m=$('#sSync');if(!m)return;m.className='';
+  if(err){m.className='bad';m.textContent=err==='auth'?'GitHub didn\u2019t accept the token.':err==='offline'?'Offline — it will back up when you\u2019re connected.':'Backup failed — it will try again.';return}
+  m.textContent=!cfg.gh?'Not set up.':cfg.lastSync?`Last backup ${when(cfg.lastSync)}${cfg.dirty?' · changes waiting':''}.`:'Not backed up yet.'}
+window.addEventListener('online',()=>{if(cfg.gh&&cfg.dirty)push().catch(()=>{})});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&cfg.gh&&cfg.dirty){clearTimeout(syncT);push().catch(()=>{})}});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+
+/* ---------- posters ---------- */
+const gc=new Map(),cv=document.createElement('canvas');cv.width=200;cv.height=300;
+const cx=cv.getContext('2d',{willReadFrequently:true});
+const letter=t=>{const m=String(t||'').replace(/^(the|a|an)\s+/i,'').match(/[\p{L}\p{N}]/u);return m?m[0].toUpperCase():'?'};
+function glyph(t){
+  const L=letter(t);if(gc.has(L))return gc.get(L);
+  cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,200,300);
+  cx.font='700 210px "Space Grotesk", sans-serif';cx.textAlign='center';cx.textBaseline='alphabetic';
+  const m=cx.measureText(L),asc=m.actualBoundingBoxAscent||150,des=m.actualBoundingBoxDescent||0;
+  const sc=Math.min(1,170/(m.width||1),220/(asc+des));
+  cx.setTransform(sc,0,0,sc,100*(1-sc),150*(1-sc));cx.fillStyle='#000';cx.fillText(L,100,150+(asc-des)/2);
+  const d=cx.getImageData(0,0,200,300).data;let out='';
+  for(let r=0;r<15;r++)for(let c=0;c<10;c++){let n=0;
+    for(let y=r*20+4;y<r*20+16;y+=2)for(let x=c*20+4;x<c*20+16;x+=2)if(d[(y*200+x)*4+3]>120)n++;
+    if(n>=13)out+=`<circle cx="${c+.5}" cy="${r+.5}" r=".4"/>`}
+  gc.set(L,out);return out}
+const RAD=[.11,.17,.24,.31,.38,.46];
+function halftone(dots){let o='';for(let i=0;i<384;i++){const v=+dots[i]||0,x=i%16+.5,y=(i/16|0)+.5;o+=v?`<circle cx="${x}" cy="${y}" r="${RAD[v]}"/>`:`<circle class="z" cx="${x}" cy="${y}" r=".11"/>`}return o}
+function poster(t,size){
+  const live=t.status==='watching'?'<i class="live"></i>':'';
+  if(cfg.posters==='photo'&&t.poster)return`<span class="pm ph"><img src="${IMG}${size||'w185'}${esc(t.poster)}" alt="" loading="lazy">${live}</span>`;
+  if(t.dots&&t.dots.length===384)return`<span class="pm ht"><svg viewBox="0 0 16 24" aria-hidden="true">${halftone(t.dots)}</svg>${live}</span>`;
+  return`<span class="pm"><svg viewBox="0 0 10 15" aria-hidden="true">${glyph(t.title)}</svg>${live}</span>`}
+function makeDots(path){return new Promise(res=>{
+  if(!path)return res('');const im=new Image();im.crossOrigin='anonymous';
+  im.onload=()=>{try{const c=document.createElement('canvas');c.width=16;c.height=24;const x=c.getContext('2d');
+    const r=Math.max(16/im.width,24/im.height),w=im.width*r,h=im.height*r;x.imageSmoothingQuality='high';x.drawImage(im,(16-w)/2,(24-h)/2,w,h);
+    const d=x.getImageData(0,0,16,24).data,L=[];for(let i=0;i<d.length;i+=4)L.push(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2]);
+    const s=[...L].sort((a,b)=>a-b),mn=s[8],mx=s[375],sp=Math.max(1,mx-mn);
+    res(L.map(v=>Math.max(0,Math.min(5,Math.round((v-mn)/sp*5)))).join(''))}catch(e){res('')}};
+  im.onerror=()=>res('');im.src=IMG+'w185'+path})}
+const tried=new Set();
+async function fillDots(){for(const t of items.slice()){if(t.poster&&!t.dots&&!tried.has(t.id)){tried.add(t.id);const d=await makeDots(t.poster);if(d){const x=items.find(i=>i.id===t.id);if(x){x.dots=d;persist();render()}}}}}
+
+const kindL=k=>k==='series'?'Series':'Film';
+const mainCat=t=>{const s=(t.subs||[])[0];return s&&SUB[s]?SUB[s].l:(t.genres||[])[0]&&GEN[t.genres[0]]?GEN[t.genres[0]].n:''};
+const metaOf=t=>[t.year,kindL(t.kind),mainCat(t)].filter(Boolean).join(' · ');
+
+/* ---------- TMDB ---------- */
+async function tm(path,params={}){
+  const k=(cfg.key||'').trim();if(!k)throw{code:'nokey'};
+  const u=new URL('https://api.themoviedb.org/3'+path);Object.entries(params).forEach(([a,b])=>u.searchParams.set(a,b));
+  const h={accept:'application/json'};if(/^[0-9a-f]{32}$/i.test(k))u.searchParams.set('api_key',k);else h.Authorization='Bearer '+k;
+  let r;try{r=await fetch(u,{headers:h})}catch(e){throw{code:'offline'}}
+  if(r.status===401)throw{code:'auth'};if(r.status===429)throw{code:'rate'};if(!r.ok)throw{code:'http'};return r.json()}
+function categorise(genreIds,text,lang){
+  const g=new Set();genreIds.forEach(id=>(TG[id]||[]).forEach(x=>g.add(x)));
+  if(genreIds.includes(10765)){g.add(FANT.test(text)&&!/science fiction|space|alien|robot|future|dystopi|time travel/.test(text)?'fantasy':'scifi')}
+  const subs=[];TAX.forEach(G=>{if(!g.has(G.id))return;let n=0;G.subs.forEach(s=>{if(n<3&&RX[s]&&RX[s].test(text)){subs.push(s);n++}})});
+  if(g.has('animation')&&lang==='ja'&&!subs.includes('animation.anime'))subs.unshift('animation.anime');
+  return{genres:TAX.map(x=>x.id).filter(id=>g.has(id)),subs:subs.slice(0,5)}}
+async function details(r){
+  if(r.media_type==='tv'){
+    const d=await tm(`/tv/${r.id}`,{append_to_response:'credits,keywords,external_ids',language:'en-US'});
+    const kw=(d.keywords?.results||[]).map(k=>k.name).join(' | ').toLowerCase();
+    const c=categorise((d.genres||[]).map(x=>x.id),kw.split('|').length>=3?kw:kw+' || '+String(d.overview||'').toLowerCase(),d.original_language);
+    return{tmdb:d.id,kind:'series',title:d.name,year:parseInt(d.first_air_date)||'',seasons:d.number_of_seasons||'',runtime:'',creator:(d.created_by||[]).map(x=>x.name).slice(0,2).join(', '),
+      cast:(d.credits?.cast||[]).slice(0,3).map(x=>x.name),synopsis:d.overview||'',poster:d.poster_path||'',imdb:d.external_ids?.imdb_id||'',...c}}
+  const d=await tm(`/movie/${r.id}`,{append_to_response:'credits,keywords',language:'en-US'});
+  const kw=(d.keywords?.keywords||[]).map(k=>k.name).join(' | ').toLowerCase();
+  const c=categorise((d.genres||[]).map(x=>x.id),kw.split('|').length>=3?kw:kw+' || '+String(d.overview||'').toLowerCase(),d.original_language);
+  return{tmdb:d.id,kind:'film',title:d.title,year:parseInt(d.release_date)||'',runtime:d.runtime||'',seasons:'',creator:(d.credits?.crew||[]).filter(x=>x.job==='Director').map(x=>x.name).slice(0,2).join(', '),
+    cast:(d.credits?.cast||[]).slice(0,3).map(x=>x.name),synopsis:d.overview||'',poster:d.poster_path||'',imdb:d.imdb_id||'',...c}}
+async function omdb(imdb){
+  const k=(cfg.omdb||'').trim();if(!k||!imdb)return null;
+  try{const r=await fetch('https://www.omdbapi.com/?i='+encodeURIComponent(imdb)+'&apikey='+encodeURIComponent(k));const d=await r.json();
+    if(d.Response==='False')return d.Error&&/key/i.test(d.Error)?{err:'auth'}:null;
+    const v=parseFloat(d.imdbRating);return isNaN(v)?null:{rating:v,votes:d.imdbVotes&&d.imdbVotes!=='N/A'?d.imdbVotes:''}}
+  catch(e){return null}}
+async function addImdb(t){const o=await omdb(t.imdb);if(o&&o.rating){t.imdbRating=o.rating;t.imdbVotes=o.votes;return true}return false}
+const ERR={nokey:'Add your free TMDB key in Settings first.',auth:'TMDB didn’t accept your key. Check it in Settings.',rate:'TMDB is busy. Try again in a few seconds.',offline:'No connection. Lookups need internet; your log works offline.',http:'TMDB didn’t answer. Try again.'};
+
+/* ---------- home ---------- */
+function note(s){$('#note').textContent=s}
+function base(){let a=items;if(ui.kind==='queue')return a.filter(t=>t.status==='want');a=a.filter(t=>t.status!=='want');return ui.kind==='all'?a:a.filter(t=>t.kind===ui.kind)}
+function render(){
+  const b=base();
+  const gs=TAX.filter(g=>b.some(t=>(t.genres||[]).includes(g.id)));
+  if(ui.g&&!gs.some(g=>g.id===ui.g)){ui.g='';ui.s=''}
+  $('#gChips').innerHTML=gs.length?`<button class="chip ${ui.g?'':'on'}" data-g="">All</button>`+gs.map(g=>`<button class="chip ${ui.g===g.id?'on':''}" data-g="${g.id}">${g.n}</button>`).join(''):'';
+  let subs=[];if(ui.g){const inG=b.filter(t=>(t.genres||[]).includes(ui.g));subs=GEN[ui.g].subs.filter(s=>inG.some(t=>(t.subs||[]).includes(s)))}
+  if(ui.s&&!subs.includes(ui.s))ui.s='';
+  $('#sChips').innerHTML=subs.map(s=>`<button class="chip ${ui.s===s?'on':''}" data-s="${s}">${esc(SUB[s].l)}</button>`).join('');
+  let a=b;
+  if(ui.g)a=a.filter(t=>(t.genres||[]).includes(ui.g));
+  if(ui.s)a=a.filter(t=>(t.subs||[]).includes(ui.s));
+  if(ui.q){const q=ui.q.toLowerCase();a=a.filter(t=>[t.title,t.year,t.creator,(t.cast||[]).join(' '),t.thoughts].join(' ').toLowerCase().includes(q))}
+  const by={recent:(x,y)=>String(y.date||'').localeCompare(String(x.date||''))||(y.added||0)-(x.added||0),
+    rating:(x,y)=>(y.rating||0)-(x.rating||0)||String(x.title).localeCompare(String(y.title)),
+    az:(x,y)=>String(x.title).localeCompare(String(y.title))};
+  a=a.slice().sort(by[ui.sort]);
+  if(!items.length){$('#list').innerHTML=`<div class="empty">${poster({title:'W'})}<div>Nothing logged yet.</div><button class="btn" id="bFirst">Add your first title</button>${cfg.key?'':'<button class="ghost" id="bKey">Set up TMDB lookups</button>'}</div>`;return}
+  if(!a.length){$('#list').innerHTML=`<div class="empty">${ui.kind==='queue'&&!ui.q?'Your queue is empty. Add a title and mark it “Want”.':'Nothing matches.'}</div>`;return}
+  $('#list').innerHTML=a.map(t=>`<button class="row" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
+
+$('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;ui.kind=k;ui.g='';ui.s='';
+  document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();$('#list').scrollTop=0});
+const SORTS=['recent','rating','az'],SL={recent:'Recent',rating:'Rating',az:'A–Z'};
+$('#bSort').addEventListener('click',()=>{ui.sort=SORTS[(SORTS.indexOf(ui.sort)+1)%3];$('#bSort').textContent=SL[ui.sort];render()});
+$('#gChips').addEventListener('click',e=>{const c=e.target.closest('[data-g]');if(!c)return;ui.g=ui.g===c.dataset.g?'':c.dataset.g;ui.s='';render()});
+$('#sChips').addEventListener('click',e=>{const c=e.target.closest('[data-s]');if(!c)return;ui.s=ui.s===c.dataset.s?'':c.dataset.s;render()});
+$('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hidden=false;$('#q').focus()});
+$('#bSearchX').addEventListener('click',()=>{ui.q='';$('#q').value='';$('#topB').hidden=true;$('#topA').hidden=false;render()});
+$('#q').addEventListener('input',e=>{ui.q=e.target.value.trim();render()});
+$('#list').addEventListener('click',e=>{if(e.target.closest('#bFirst'))return openAdd();if(e.target.closest('#bKey'))return openSet();
+  const r=e.target.closest('.row');if(r){const t=items.find(x=>x.id===r.dataset.id);if(t)openEd(t,false)}});
+
+/* ---------- overlays + back button ---------- */
+const stack=[];let popSkip=0,pushed=false;
+function open(id){const el=$('#'+id);if(el.classList.contains('open'))return;el.classList.add('open');
+  if(!stack.length&&!pushed){try{history.pushState({w:1},'');pushed=true}catch(e){}}stack.push(id)}
+function close(id){const el=$('#'+id);if(!el.classList.contains('open'))return;el.classList.remove('open');const i=stack.lastIndexOf(id);if(i>=0)stack.splice(i,1);
+  if(!stack.length&&pushed){pushed=false;popSkip++;history.back()}}
+window.addEventListener('popstate',()=>{if(popSkip){popSkip--;return}pushed=false;const id=stack[stack.length-1];if(!id)return;
+  const keep=()=>{try{history.pushState({w:1},'');pushed=true}catch(e){}};
+  if(id==='ovEd'&&!xArm&&edDirty()){armX(true);keep();return}
+  $('#'+id).classList.remove('open');stack.pop();if(id==='ovEd')cur=null;else renderEd();if(stack.length)keep()});
+document.addEventListener('click',e=>{const c=e.target.closest('[data-close]');if(c)close(c.dataset.close);const s=e.target.closest('[data-closesh]');if(s){close(s.dataset.closesh);renderEd()}
+  if(e.target.classList.contains('sh')){close(e.target.id);renderEd()}});
+let tt;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2000)}
+
+/* ---------- add ---------- */
+let lastRes=[];
+function openAdd(){$('#fq').value='';$('#res').innerHTML=cfg.key?'':`<div class="msg">${ERR.nokey}<br><br><button class="btn line sm" id="bKey2">Open Settings</button></div>`;open('ovAdd');if(cfg.key)setTimeout(()=>$('#fq').focus(),330)}
+$('#bAdd').addEventListener('click',openAdd);
+let busy=false;
+$('#fFind').addEventListener('submit',async e=>{
+  e.preventDefault();let q=$('#fq').value.trim();if(!q||busy)return;busy=true;$('#fq').blur();
+  const ym=q.match(/\s((19|20)\d{2})$/),yr=ym?ym[1]:'';if(yr)q=q.slice(0,-5).trim();
+  $('#res').innerHTML='<div class="load"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
+  try{const d=await tm('/search/multi',{query:q,include_adult:'false',language:'en-US'});
+    lastRes=(d.results||[]).filter(r=>r.media_type==='movie'||r.media_type==='tv').map(r=>({...r,yr:String(parseInt(r.release_date||r.first_air_date)||'')}));
+    if(yr)lastRes.sort((a,b)=>(b.yr===yr)-(a.yr===yr));
+    lastRes=lastRes.slice(0,8);
+    $('#res').innerHTML=lastRes.length?lastRes.map((r,i)=>{const kind=r.media_type==='tv'?'series':'film',have=items.some(t=>t.tmdb===r.id&&t.kind===kind);
+      const pv=r.poster_path?`<span class="pm ph"><img src="${IMG}w92${esc(r.poster_path)}" alt="" loading="lazy"></span>`:poster({title:r.title||r.name});
+      return`<button class="rc" data-i="${i}">${pv}<span><b>${esc(r.title||r.name)}</b><small>${esc([r.yr,kindL(kind)].filter(Boolean).join(' · '))}</small><p>${esc(r.overview)}</p>${have?'<span class="tag">In your log</span>':''}</span></button>`}).join('')
+      :'<div class="msg">No match on TMDB. Try another spelling, or enter it manually.</div>'}
+  catch(err){$('#res').innerHTML=`<div class="msg">${ERR[err&&err.code]||ERR.http}</div>`}
+  busy=false});
+$('#res').addEventListener('click',async e=>{
+  if(e.target.closest('#bKey2')){openSet();return close('ovAdd')}
+  const c=e.target.closest('.rc');if(!c||busy)return;const r=lastRes[+c.dataset.i],kind=r.media_type==='tv'?'series':'film';
+  const ex=items.find(t=>t.tmdb===r.id&&t.kind===kind);if(ex){openEd(ex,false);return close('ovAdd')}
+  busy=true;c.classList.add('busy');
+  try{const d=await details(r);const[dd]=await Promise.all([makeDots(d.poster),addImdb(d)]);d.dots=dd;openEd({...d,id:uid(),rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd')}
+  catch(err){toast(ERR[err&&err.code]||ERR.http)}
+  c.classList.remove('busy');busy=false});
+$('#bManual').addEventListener('click',()=>{openEd({id:uid(),title:$('#fq').value.trim(),year:'',kind:'film',runtime:'',seasons:'',creator:'',cast:[],synopsis:'',genres:[],subs:[],rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd');if(!cur.title)openDet()});
+
+/* ---------- editor ---------- */
+let cur=null,isNew=false,snap0='',catG='scifi';
+const edDirty=()=>cur&&(isNew?true:JSON.stringify({...cur,thoughts:$('#eTh').value})!==snap0);
+function openEd(t,n){cur=JSON.parse(JSON.stringify(t));cur.cast=cur.cast||[];cur.thoughts=cur.thoughts||'';cur.genres=cur.genres||[];cur.subs=cur.subs||[];isNew=n;
+  snap0=JSON.stringify(cur);$('#eTh').value=cur.thoughts;$('#bDel').hidden=n;armX(false);armDel(false);renderEd();$('.ed').scrollTop=0;open('ovEd');
+  if(!n&&cur.imdb&&!cur.imdbRating&&cfg.omdb){const id=cur.id,imdb=cur.imdb;omdb(imdb).then(o=>{if(!o||!o.rating)return;const x=items.find(i=>i.id===id);if(x){x.imdbRating=o.rating;x.imdbVotes=o.votes;persist()}
+    if(cur&&cur.id===id){cur.imdbRating=o.rating;cur.imdbVotes=o.votes;snap0=JSON.stringify({...JSON.parse(snap0),imdbRating:o.rating,imdbVotes:o.votes});renderEd()}})}}
+function renderEd(){
+  if(!cur)return;
+  const m=[cur.year,kindL(cur.kind),cur.kind==='series'?(cur.seasons?cur.seasons+(cur.seasons==1?' season':' seasons'):''):(cur.runtime?cur.runtime+' min':'')].filter(Boolean).join(' · ');
+  $('#eHero').innerHTML=`${poster(cur,'w342')}<div><h3>${esc(cur.title||'Untitled')}</h3><p class="mt">${esc(m)}</p>${cur.imdbRating?`<p class="im"><span>IMDb</span><b>${cur.imdbRating.toFixed(1)}</b>${cur.imdbVotes?`<span>${esc(cur.imdbVotes)} votes</span>`:''}</p>`:''}${cur.creator||cur.cast.length?`<p class="cr">${esc([cur.creator,cur.cast.join(', ')].filter(Boolean).join(' · '))}</p>`:''}${cur.synopsis?`<p class="syn" id="eSyn">${esc(cur.synopsis)}</p>`:''}<button class="edl" id="bDet">Edit details</button></div>`;
+  $('#eRate').innerHTML=Array.from({length:10},(_,i)=>`<button class="${i<cur.rating?'on':''} ${cur.rating>=9&&i===cur.rating-1?'hi':''}" data-r="${i+1}" aria-label="Rate ${i+1}"></button>`).join('');
+  $('#eScore').innerHTML=cur.rating?`${cur.rating}<small>/10</small>`:'<small>tap a dot</small>';
+  document.querySelectorAll('#eStat button').forEach(b=>b.classList.toggle('on',b.dataset.s===cur.status));
+  $('#eDate').value=cur.date||'';$('#eDate').hidden=cur.status==='want';
+  const chips=[];cur.genres.forEach(g=>{if(!GEN[g])return;chips.push(`<span class="chip g">${GEN[g].n}</span>`);cur.subs.filter(s=>SUB[s]&&SUB[s].g===g).forEach(s=>chips.push(`<span class="chip">${esc(SUB[s].l)}</span>`))});
+  $('#eCats').innerHTML=chips.join('')+`<span class="chip add2">${chips.length?'Edit':'+ Add categories'}</span>`;
+  $('#eImdb').href=cur.imdb?'https://www.imdb.com/title/'+encodeURIComponent(cur.imdb)+'/':'https://www.imdb.com/find/?q='+encodeURIComponent([cur.title,cur.year].filter(Boolean).join(' '))}
+$('#eRate').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;const r=+b.dataset.r;cur.rating=cur.rating===r?0:r;renderEd()});
+$('#eStat').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;cur.status=b.dataset.s;if(cur.status!=='want'&&!cur.date)cur.date=today();renderEd()});
+$('#eDate').addEventListener('change',e=>{cur.date=e.target.value});
+$('#eHero').addEventListener('click',e=>{if(e.target.id==='eSyn')e.target.classList.toggle('full');if(e.target.id==='bDet')openDet()});
+let xArm=false,dArm=false;
+function armX(v){xArm=v;$('#bEdX').textContent=v?'Discard changes?':'Close';$('#bEdX').style.color=v?'var(--red)':''}
+function armDel(v){dArm=v;$('#bDel').textContent=v?'Tap again to delete':'Delete';$('#bDel').classList.toggle('arm',v)}
+$('#bEdX').addEventListener('click',()=>{if(!xArm&&edDirty())return armX(true);close('ovEd');cur=null});
+$('#bSave').addEventListener('click',()=>{
+  if(!cur.title){openDet();return toast('Give it a title first')}
+  cur.thoughts=$('#eTh').value;cur.updated=Date.now();if(isNew)cur.added=Date.now();
+  const n=isNew,t=cur;upsert(t);close('ovEd');cur=null;toast(n?'Added to your log':'Saved')});
+$('#bDel').addEventListener('click',()=>{if(!dArm)return armDel(true);removeItem(cur.id);close('ovEd');cur=null;toast('Deleted')});
+
+/* ---------- categories ---------- */
+$('#eCats').addEventListener('click',()=>{catG=cur.genres[0]||'scifi';renderCats();open('shCat')});
+function renderCats(){
+  const sel=new Set(cur.subs),gs=new Set(cur.genres);
+  $('#cTabs').innerHTML=TAX.map(g=>{const n=g.subs.filter(s=>sel.has(s)).length||(gs.has(g.id)?1:0);return`<button class="chip ${g.id===catG?'on':''}" data-g="${g.id}">${g.n}${n?`<i>${n}</i>`:''}</button>`}).join('');
+  const g=GEN[catG];
+  $('#cSubs').innerHTML=`<button class="tog gen ${gs.has(g.id)?'on':''}" data-tg="${g.id}">${g.n}</button>`+g.subs.map(s=>`<button class="tog ${sel.has(s)?'on':''}" data-ts="${s}">${esc(SUB[s].l)}</button>`).join('')}
+$('#cTabs').addEventListener('click',e=>{const c=e.target.closest('[data-g]');if(!c)return;catG=c.dataset.g;renderCats()});
+$('#cSubs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.tg){const g=b.dataset.tg;if(cur.genres.includes(g)){cur.genres=cur.genres.filter(x=>x!==g);cur.subs=cur.subs.filter(s=>SUB[s].g!==g)}else cur.genres.push(g)}
+  else{const s=b.dataset.ts;if(cur.subs.includes(s))cur.subs=cur.subs.filter(x=>x!==s);else{cur.subs.push(s);if(!cur.genres.includes(SUB[s].g))cur.genres.push(SUB[s].g)}}
+  renderCats()});
+
+/* ---------- details ---------- */
+let dKind='film';
+function setDK(k){dKind=k;document.querySelectorAll('#dK button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));
+  $('#dCL').firstChild.textContent=k==='series'?'Creator':'Director';$('#dRL').firstChild.textContent=k==='series'?'Seasons':'Minutes'}
+function openDet(){$('#dT').value=cur.title||'';$('#dY').value=cur.year||'';$('#dC').value=cur.creator||'';$('#dA').value=(cur.cast||[]).join(', ');$('#dS').value=cur.synopsis||'';
+  setDK(cur.kind||'film');$('#dR').value=(cur.kind==='series'?cur.seasons:cur.runtime)||'';open('shDet');if(!cur.title)setTimeout(()=>$('#dT').focus(),250)}
+$('#dK').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b)setDK(b.dataset.k)});
+$('#fDet').addEventListener('submit',e=>{e.preventDefault();$('#bDetOk').click()});
+$('#bDetOk').addEventListener('click',()=>{
+  cur.title=$('#dT').value.trim();cur.year=parseInt($('#dY').value)||'';cur.kind=dKind;cur.creator=$('#dC').value.trim();
+  cur.cast=$('#dA').value.split(',').map(s=>s.trim()).filter(Boolean);cur.synopsis=$('#dS').value.trim();
+  const n=parseInt($('#dR').value)||'';if(dKind==='series'){cur.seasons=n;cur.runtime=''}else{cur.runtime=n;cur.seasons=''}
+  close('shDet');renderEd()});
+
+/* ---------- settings ---------- */
+function openSet(){$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$('#sOmdbMsg').textContent='';$('#sKeyMsg').textContent='';$('#sKeyMsg').className='';
+  document.querySelectorAll('#sPost button').forEach(b=>b.classList.toggle('on',b.dataset.p===cfg.posters));
+  $('#sGh').value=cfg.gh||'';syncMsg();$('#sCount').textContent=`${items.length} title${items.length===1?'':'s'} stored on this phone. Export saves a file to Downloads; Import reads one back.`;open('shSet')}
+$('#bSet').addEventListener('click',openSet);
+$('#sKey').addEventListener('input',e=>{cfg.key=e.target.value.trim();saveCfg();$('#sKeyMsg').textContent=''});
+$('#sOmdb').addEventListener('input',e=>{cfg.omdb=e.target.value.trim();saveCfg();$('#sOmdbMsg').textContent=''});
+$('#bTestO').addEventListener('click',async()=>{const m=$('#sOmdbMsg');m.className='';if(!cfg.omdb){m.textContent='Paste a key first';m.className='bad';return}m.textContent='Checking…';
+  const o=await omdb('tt0816692');if(o&&o.rating){m.textContent='Connected';m.className='ok'}else{m.textContent=o&&o.err?'Key not accepted':'No answer — check the key or connection';m.className='bad'}});
+$('#bTest').addEventListener('click',async()=>{const m=$('#sKeyMsg');m.className='';m.textContent='Checking…';
+  try{await tm('/configuration');m.textContent='Connected';m.className='ok'}catch(e){m.textContent=e.code==='nokey'?'Paste a key first':e.code==='offline'?'No connection':'Key not accepted';m.className='bad'}});
+$('#sPost').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;cfg.posters=b.dataset.p;saveCfg();
+  document.querySelectorAll('#sPost button').forEach(x=>x.classList.toggle('on',x.dataset.p===cfg.posters));render()});
+$('#sGh').addEventListener('change',e=>{const v=e.target.value.trim();if(v===cfg.gh)return;cfg.gh=v;cfg.gist='';cfg.lastSync=0;saveCfg();syncMsg()});
+$('#bSync').addEventListener('click',async()=>{if(!cfg.gh)return toast('Paste a GitHub token first');$('#sSync').textContent='Backing up…';
+  try{await push();toast('Backed up to GitHub')}catch(e){}});
+let restArm=false;
+$('#bRest').addEventListener('click',async()=>{if(!cfg.gh)return toast('Paste a GitHub token first');const m=$('#sSync');m.className='';m.textContent='Looking for your backup…';
+  try{const arr=await pull();const n=merge(arr);m.textContent=`Restored ${arr.length} titles (${n} new or newer).`;toast('Restored from GitHub');if(n)changed()}
+  catch(e){m.className='bad';m.textContent=e.code==='none'?'No Watchlog backup found on this GitHub account yet.':e.code==='auth'?'GitHub didn\u2019t accept the token.':e.code==='offline'?'No connection.':'Restore failed. Try again.'}});
+$('#bExp').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify({app:'watchlog',version:1,exported:new Date().toISOString(),items},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`watchlog-${today()}.json`;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('Backup saved to Downloads')});
+$('#bImp').addEventListener('click',()=>$('#fImp').click());
+$('#fImp').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const d=JSON.parse(await f.text()),arr=Array.isArray(d)?d:d.items;if(!Array.isArray(arr))throw 0;
+    const ok=arr.filter(t=>t&&typeof t==='object'&&t.id&&t.title);const ids=new Set(ok.map(t=>String(t.id)));
+    items=items.filter(t=>!ids.has(String(t.id))).concat(ok.map(t=>({...t,id:String(t.id)})));persist();render();openSet();toast(`Imported ${ok.length} titles`);fillDots();changed()}
+  catch(err){toast('That file isn’t a Watchlog backup')}});
+
+/* ---------- start ---------- */
+load();render();
+document.fonts&&document.fonts.ready.then(()=>{gc.clear();render();renderEd()});
+setTimeout(fillDots,1500);
+if(cfg.gh&&cfg.dirty)setTimeout(()=>push().catch(()=>{}),3000);
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
