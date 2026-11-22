@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Doto:wght@500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* VOICE: quiet, exact, a little playful — a Nothing phone app.
-   IDEA: the Glyph / dot-matrix display: every poster is re-drawn as halftone dots.
+   IDEA: the Glyph / dot-matrix display: dot type and dot ratings around real posters.
    PICTURE: the list of dot tiles; the 10-dot rating bar in the editor.
    COLOUR and TYPE: pure black or paper white, ink, one Nothing red; Doto for numbers and labels, Space Grotesk for text.
    LAYOUT: one fixed phone screen, no page scroll; only the list scrolls; sheets slide over. */
@@ -60,8 +60,8 @@ button:disabled{opacity:.5}
 .sc.no{color:var(--dim)}
 .pm{display:block;aspect-ratio:2/3;border-radius:6px;background-color:var(--card);background-image:radial-gradient(circle,var(--dim) 30%,transparent 36%);background-size:10% calc(100%/15);overflow:hidden;position:relative}
 .pm svg,.pm img{display:block;width:100%;height:100%;fill:var(--ink);object-fit:cover}
-.pm.ht{background:#000}.pm.ht svg{fill:#f4f4f4}.pm.ht .z{fill:#262626}
 .pm.ph{background:var(--card)}
+.bw .pm img{filter:grayscale(1) contrast(1.08)}
 .pm .rd{fill:var(--red)}
 .pm .live{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--red)}
 .empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;color:var(--mute);padding:0 24px 40px}
@@ -221,6 +221,7 @@ button:disabled{opacity:.5}
 <div class="sh" id="shCat">
   <div class="sp">
     <div class="ph"><h2>Categories</h2><button class="btn ink sm" data-closesh="shCat">Done</button></div>
+    <button class="edl" id="bAuto" style="align-self:flex-start;margin:-6px 0 8px">Auto-detect from TMDB</button>
     <div class="chips" id="cTabs"></div>
     <div class="subs" id="cSubs"></div>
   </div>
@@ -251,13 +252,13 @@ button:disabled{opacity:.5}
   <div class="sp">
     <div class="ph"><h2>Settings</h2><button class="btn ink sm" data-closesh="shSet">Done</button></div>
     <div class="form">
-      <label>TMDB key<input id="sKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="API key or Read Access Token"></label>
+      <label>TMDB key<input id="sKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Using built-in key"></label>
       <div class="row2"><button class="btn line sm" id="bTest">Check key</button><span id="sKeyMsg" style="font-size:14px"></span></div>
-      <p>Free at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">themoviedb.org → Settings → API</a>. Either the API key or the Read Access Token works. It stays on this phone.</p>
-      <label>OMDb key (IMDb rating)<input id="sOmdb" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Optional"></label>
+      <p>Free at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">themoviedb.org → Settings → API</a>. A built-in key is already set up. Paste your own (API key or Read Access Token) only if you want to use it instead; leave empty to use the built-in one.</p>
+      <label>OMDb key (IMDb rating)<input id="sOmdb" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Using built-in key"></label>
       <div class="row2"><button class="btn line sm" id="bTestO">Check key</button><span id="sOmdbMsg" style="font-size:14px"></span></div>
-      <p>Free at <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com → API Key</a> (the free plan, confirmed by email). Adds the IMDb rating to titles you look up.</p>
-      <label>Posters<div class="seg" id="sPost"><button type="button" data-p="dot">Dot matrix</button><button type="button" data-p="photo">Photo</button></div></label>
+      <p>Free at <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com → API Key</a> (free plan). A built-in key is already set up; paste your own only if you want to use it instead.</p>
+      <label>Posters<div class="seg" id="sPost"><button type="button" data-p="color">Colour</button><button type="button" data-p="bw">Black &amp; white</button></div></label>
       <label>Cloud backup (GitHub)<input id="sGh" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="GitHub token with gist access"></label>
       <div class="row2"><button class="btn line sm" id="bSync">Back up now</button><button class="btn line sm" id="bRest">Restore</button></div>
       <p id="sSync"></p>
@@ -275,21 +276,23 @@ button:disabled{opacity:.5}
 <script>
 {
 const TAX=[
- {id:'scifi',n:'Sci-Fi',s:['Space Opera','Hard SF','Cyberpunk','Time Travel','First Contact','Alien Invasion','AI & Robots','Dystopian','Post-Apocalyptic','Space Exploration','Military SF','Biopunk','Simulation & VR','Mind-Bending','Alternate History','Clones & Identity','Climate Fiction','Solarpunk','Retro-Futurism','Space Western','Steampunk','Kaiju','Superhero','Survival']},
- {id:'drama',n:'Drama',s:['Character Study','Period','Political','Legal','Medical','Coming-of-Age','Family','Sports','Biopic','Workplace']},
- {id:'thriller',n:'Thriller',s:['Psychological','Spy','Conspiracy','Techno-Thriller','Survival','Revenge','Political']},
- {id:'crime',n:'Crime',s:['Detective','Noir & Neo-Noir','Gangster','Heist','Procedural','Courtroom','True Story']},
- {id:'mystery',n:'Mystery',s:['Whodunit','Puzzle Box','Supernatural','Cold Case']},
- {id:'horror',n:'Horror',s:['Cosmic','Supernatural','Slasher','Folk','Body Horror','Psychological','Found Footage','Zombie','Creature','Sci-Fi Horror']},
- {id:'fantasy',n:'Fantasy',s:['Epic','Dark','Urban','Sword & Sorcery','Fairy Tale','Mythological','Portal','Magical Realism']},
- {id:'action',n:'Action',s:['Martial Arts','Spy','Disaster','Buddy','Superhero','Car & Chase','One-Man Army']},
- {id:'adventure',n:'Adventure',s:['Quest','Treasure Hunt','Survival','Swashbuckler','Exploration']},
- {id:'comedy',n:'Comedy',s:['Romcom','Satire','Dark Comedy','Sitcom','Parody','Mockumentary','Absurdist','Workplace']},
- {id:'romance',n:'Romance',s:['Romantic Drama','Period','Slow Burn','Tragic']},
- {id:'animation',n:'Animation',s:['Anime','Mecha','Adult Animation','Family','Stop-Motion']},
- {id:'docu',n:'Documentary',s:['Nature','Science & Space','History','True Crime','Music','Sports','Tech','Social Issue']},
- {id:'war',n:'War',s:['WWII','WWI','Vietnam','Modern','Cold War','Anti-War']},
- {id:'western',n:'Western',s:['Classic','Revisionist','Neo-Western','Spaghetti']}
+ {id:'scifi',n:'Sci-Fi',s:['Space Opera','Hard SF','Cyberpunk','Time Travel','First Contact','Alien Invasion','AI & Robots','Dystopian','Post-Apocalyptic','Space Exploration','Military SF','Biopunk','Simulation & VR','Mind-Bending','Alternate History','Clones & Identity','Climate Fiction','Solarpunk','Retro-Futurism','Space Western','Steampunk','Kaiju','Superhero','Survival','Near Future','Far Future','Multiverse','Transhumanism','Tech Noir','Mutants & Powers','Mecha','Utopia','Pandemic & Outbreak','Space Horror','Sci-Fi Comedy']},
+ {id:'drama',n:'Drama',s:['Character Study','Period','Political','Legal','Medical','Coming-of-Age','Family','Sports','Biopic','Workplace','Psychological','Historical','Social Realism','Ensemble','Music','Small Town','Grief & Loss','Addiction','Faith','Survival','Revenge']},
+ {id:'thriller',n:'Thriller',s:['Psychological','Spy','Conspiracy','Techno-Thriller','Survival','Revenge','Political','Cat & Mouse','Home Invasion','Hostage & Siege','Legal','Domestic','Corporate','Neo-Noir','Heist','Serial Killer','Medical','Mind Games']},
+ {id:'crime',n:'Crime',s:['Detective','Noir & Neo-Noir','Gangster','Heist','Procedural','Courtroom','True Story','Serial Killer','Buddy Cop','Prison','Drug Trade','Con Artist','Vigilante','Caper','Police Corruption','Cybercrime','Kidnapping','Crime Comedy']},
+ {id:'mystery',n:'Mystery',s:['Whodunit','Puzzle Box','Supernatural','Cold Case','Locked Room','Amateur Sleuth','Missing Person','Conspiracy','Detective','Small-Town Secrets','Psychological','Historical','Sci-Fi Mystery','Cozy','Investigative Journalism','Unreliable Narrator']},
+ {id:'horror',n:'Horror',s:['Cosmic','Supernatural','Slasher','Folk','Body Horror','Psychological','Found Footage','Zombie','Creature','Sci-Fi Horror','Haunted House','Possession','Vampire','Werewolf','Witchcraft','Survival Horror','Home Invasion','Horror Comedy','Cult','Isolation','Analog Horror','Gothic']},
+ {id:'fantasy',n:'Fantasy',s:['Epic','Dark','Urban','Sword & Sorcery','Fairy Tale','Mythological','Portal','Magical Realism','Low Fantasy','Historical Fantasy','Fantasy Comedy','Superpowers','Dragons','Magic School','Grimdark','Folklore','Coming-of-Age']},
+ {id:'action',n:'Action',s:['Martial Arts','Spy','Disaster','Buddy','Superhero','Car & Chase','One-Man Army','Military','Revenge','Heist','Video Game','Assassin','Siege','Bodyguard','Action Comedy','Survival','Prison Break']},
+ {id:'adventure',n:'Adventure',s:['Quest','Treasure Hunt','Survival','Swashbuckler','Exploration','Road Trip','Lost World','Family Adventure','Jungle','Ocean & Sea','Space Adventure','Mountain & Polar','Historical','Fantasy Quest','Coming-of-Age']},
+ {id:'comedy',n:'Comedy',s:['Romcom','Satire','Dark Comedy','Sitcom','Parody','Mockumentary','Absurdist','Workplace','Buddy','Teen','Slapstick','Dramedy','Cringe','Stand-Up','Sketch','Action Comedy','Fish Out of Water','Coming-of-Age','Raunchy','Wholesome','Family']},
+ {id:'romance',n:'Romance',s:['Romantic Drama','Period','Slow Burn','Tragic','Teen Romance','LGBTQ+','Fantasy Romance','Second Chance','Enemies to Lovers','Romcom','Forbidden Love','Love Triangle','Long-Distance','Holiday Romance','Wedding']},
+ {id:'animation',n:'Animation',s:['Anime','Mecha','Adult Animation','Family','Stop-Motion','CGI','Hand-Drawn','Anthology','Sci-Fi Animation','Fantasy Animation','Superhero Animation','Musical Animation','Short Films','Experimental','Animated Comedy','Animated Drama']},
+ {id:'docu',n:'Documentary',s:['Nature','Science & Space','History','True Crime','Music','Sports','Tech','Social Issue','Biography','Food','Travel','Art & Design','Politics','Environment','Investigative','Business','Health & Medicine','War & Conflict','Psychology','Exploration']},
+ {id:'war',n:'War',s:['WWII','WWI','Vietnam','Modern','Cold War','Anti-War','Civil War','Ancient & Medieval','Resistance','Korean War','Napoleonic','Naval','Aerial','Prisoner of War','Post-War','Espionage']},
+ {id:'family',n:'Family',s:['Kids','Coming-of-Age','Holiday','Animals','Fairy Tale','Adventure','Comedy','Sports','Magic & Fantasy','Live-Action Remake','Musical','Friendship','Pets']},
+ {id:'music',n:'Music',s:['Musical','Music Biopic','Concert','Dance','Rock','Hip-Hop','Jazz & Blues','Classical','Rise to Fame','Band Story','Electronic']},
+ {id:'western',n:'Western',s:['Classic','Revisionist','Neo-Western','Spaghetti','Weird West','Outlaw','Frontier','Revenge Western','Acid Western','Comedy Western','Gold Rush','Lawman']}
 ];
 /* keyword rules: TMDB keywords + overview are matched against these to suggest subcategories */
 const RX={
@@ -299,7 +302,7 @@ const RX={
  'scifi.ai-and-robots':/artificial intelligence|\(a\.i\.\)|robot|android|sentient/,'scifi.dystopian':/dystopi|totalitarian|authoritarian|surveillance state/,
  'scifi.post-apocalyptic':/post-apocalyptic|apocalypse|nuclear war|wasteland|end of the world/,'scifi.space-exploration':/space travel|space exploration|spacecraft|space mission|outer space|spaceship/,
  'scifi.military-sf':/space marine|military|soldier|space war/,'scifi.biopunk':/genetic engineering|mutation|bioengineer|virus|pandemic/,
- 'scifi.simulation-and-vr':/virtual reality|simulation|simulated reality|video game/,'scifi.mind-bending':/mind-bend|surreal|nonlinear|philosoph|existential|parallel (world|universe)|multiverse|dream/,
+ 'scifi.simulation-and-vr':/virtual reality|simulation|simulated reality|video game/,'scifi.mind-bending':/mind-bend|mindfuck|surreal|nonlinear|philosoph|existential|dream/,
  'scifi.alternate-history':/alternate history|alternate timeline|alternate reality/,'scifi.clones-and-identity':/clone|cloning|identity|memory|amnesia/,
  'scifi.climate-fiction':/climate change|global warming|ecolog/,'scifi.solarpunk':/solarpunk/,'scifi.retro-futurism':/retro-futur|retrofutur/,
  'scifi.space-western':/space western/,'scifi.steampunk':/steampunk/,'scifi.kaiju':/kaiju|giant monster|godzilla/,'scifi.superhero':/superhero|based on comic|super power|superpower/,'scifi.survival':/survival|stranded/,
@@ -328,9 +331,132 @@ const RX={
  'docu.nature':/nature|wildlife|animal|ocean/,'docu.science-and-space':/science|outer space|universe|physics|astronomy/,'docu.history':/history|historical/,'docu.true-crime':/true crime|murder/,
  'docu.music':/music|musician|band|concert/,'docu.sports':/sport/,'docu.tech':/technology|internet|silicon valley|computer/,'docu.social-issue':/social|inequality|climate/,
  'war.wwii':/world war ii|wwii|nazi/,'war.wwi':/world war i\b|\bwwi\b/,'war.vietnam':/vietnam/,'war.modern':/iraq|afghanistan|modern warfare/,'war.cold-war':/cold war|soviet|\bkgb\b/,'war.anti-war':/anti-war/,
- 'western.classic':/cowboy|frontier|gunslinger/,'western.revisionist':/revisionist/,'western.neo-western':/neo-western|modern western/,'western.spaghetti':/spaghetti western/
+ 'western.classic':/cowboy|frontier|gunslinger/,'western.revisionist':/revisionist/,'western.neo-western':/neo-western|modern western/,'western.spaghetti':/spaghetti western/,
+ 'scifi.near-future':/near future|near-future|2030s|2040s/,'scifi.far-future':/distant future|far future|year 3000|28th century|31st century/,'scifi.multiverse':/multiverse|parallel universe|parallel world|alternate dimension/,
+ 'scifi.transhumanism':/transhuman|consciousness transfer|mind upload|immortality|cybernetic/,'scifi.tech-noir':/tech noir|tech-noir|neo-noir|future noir/,'scifi.mutants-and-powers':/mutant|superpower|telekinesis|psychic power/,
+ 'scifi.mecha':/mecha|giant robot|exosuit/,'scifi.utopia':/utopia/,'scifi.pandemic-and-outbreak':/pandemic|epidemic|outbreak|virus|infection/,'scifi.space-horror':/space horror|alien monster|derelict spaceship/,'scifi.sci-fi-comedy':/science fiction comedy|sci-fi comedy|spoof/,
+ 'drama.psychological':/psychological drama|mental illness|trauma|psychiatr/,'drama.historical':/historical drama|historical figure|based on true story|history/,'drama.social-realism':/social realism|poverty|working class|social commentary/,
+ 'drama.ensemble':/ensemble cast|multiple storylines/,'drama.music':/musician|band|singer|jazz|orchestra/,'drama.small-town':/small town|rural/,
+ 'thriller.cat-and-mouse':/cat and mouse|manhunt|chase|fugitive/,'thriller.home-invasion':/home invasion/,'thriller.hostage-and-siege':/hostage|siege|kidnapping/,'thriller.legal':/legal thriller|lawyer|courtroom/,
+ 'thriller.domestic':/domestic thriller|marriage|husband wife relationship|infidelity/,'thriller.corporate':/corporate|corporation|whistleblower|big pharma/,
+ 'crime.serial-killer':/serial killer/,'crime.buddy-cop':/buddy cop|police partner/,'crime.prison':/prison|inmate|jailbreak|prison escape/,'crime.drug-trade':/drug|cartel|cocaine|heroin|narcotic/,
+ 'crime.con-artist':/con artist|con man|scam|swindle|grifter|fraud/,'crime.vigilante':/vigilante/,
+ 'mystery.locked-room':/locked room|closed circle/,'mystery.amateur-sleuth':/amateur detective|amateur sleuth|true crime podcast/,'mystery.missing-person':/missing person|disappearance|abduction/,'mystery.conspiracy':/conspiracy|secret society|cover-up/,
+ 'horror.haunted-house':/haunted house|haunted mansion|haunting/,'horror.possession':/possession|exorcism|demonic/,'horror.vampire':/vampire/,'horror.werewolf':/werewolf/,'horror.witchcraft':/witch|witchcraft|coven|occult/,
+ 'horror.survival-horror':/survival horror|trapped|survival/,'horror.home-invasion':/home invasion/,'horror.horror-comedy':/horror comedy|comedy horror|splatter comedy/,
+ 'fantasy.low-fantasy':/low fantasy/,'fantasy.historical-fantasy':/historical fantasy|alternate history|medieval/,'fantasy.fantasy-comedy':/fantasy comedy/,'fantasy.superpowers':/superpower|superhuman|super power/,
+ 'action.military':/military|soldier|special forces|navy seal|marine/,'action.revenge':/revenge|vengeance/,'action.heist':/heist|robbery/,'action.video-game':/based on video game/,
+ 'adventure.road-trip':/road trip|road movie/,'adventure.lost-world':/lost world|dinosaur|hidden civilization|lost city/,'adventure.family-adventure':/family adventure|family/,
+ 'comedy.buddy':/buddy comedy|buddy/,'comedy.teen':/teen comedy|high school|teenager/,'comedy.slapstick':/slapstick/,'comedy.dramedy':/dramedy|comedy drama/,'comedy.cringe':/cringe|awkward/,
+ 'romance.teen-romance':/teen romance|first love|high school/,'romance.lgbtq':/lgbt|gay|lesbian|queer|bisexual|transgender/,'romance.fantasy-romance':/fantasy romance|supernatural romance/,'romance.second-chance':/second chance|rekindled|ex-lover/,'romance.enemies-to-lovers':/enemies to lovers|rivals to lovers/,
+ 'animation.cgi':/computer animation|cgi/,'animation.hand-drawn':/hand-drawn|traditional animation|2d animation/,'animation.anthology':/anthology/,
+ 'docu.biography':/biography|biographical/,'docu.food':/food|cooking|chef|restaurant/,'docu.travel':/travel/,'docu.art-and-design':/art|artist|design|architecture|painter/,'docu.politics':/politic|election|government/,'docu.environment':/environment|climate|conservation/,
+ 'war.civil-war':/civil war/,'war.ancient-and-medieval':/ancient rome|ancient greece|medieval|crusades|viking|roman empire/,'war.resistance':/resistance|partisan|occupation/,
+ 'western.weird-west':/weird west|supernatural western/,'western.outlaw':/outlaw|bandit|bank robbery/,'western.frontier':/frontier|settler|homestead/,
+ 'family.kids':/children|kids|childhood/,'family.coming-of-age':/coming of age/,'family.holiday':/christmas|holiday|halloween/,'family.animals':/animal|dog|cat|horse/,'family.fairy-tale':/fairy tale|fable/,
+ 'music.musical':/musical/,'music.music-biopic':/music biopic|biography/,'music.concert':/concert|live performance/,'music.dance':/dance|dancing|ballet/,
+ 'drama.grief-and-loss':/grief|loss of loved one|death of (wife|husband|mother|father|son|daughter|child)|bereavement|mourning/,
+ 'drama.addiction':/addiction|alcoholism|drug addiction|recovery|rehab/,
+ 'drama.faith':/religion|faith|christian|priest|church|nun/,
+ 'drama.survival':/survival|stranded/,
+ 'drama.revenge':/revenge|vengeance/,
+ 'thriller.neo-noir':/neo-noir|noir/,
+ 'thriller.heist':/heist|robbery/,
+ 'thriller.serial-killer':/serial killer/,
+ 'thriller.medical':/medical thriller|hospital|doctor|surgeon|disease/,
+ 'thriller.mind-games':/mind game|manipulation|gaslighting|deception/,
+ 'crime.caper':/caper|heist/,
+ 'crime.police-corruption':/police corruption|corrupt cop|dirty cop|corruption/,
+ 'crime.cybercrime':/hacker|hacking|cyber/,
+ 'crime.kidnapping':/kidnapping|abduction|ransom/,
+ 'crime.crime-comedy':/crime comedy|dark comedy|black comedy/,
+ 'mystery.detective':/detective|investigator/,
+ 'mystery.small-town-secrets':/small town|village|secret/,
+ 'mystery.psychological':/psychological|unreliable narrator|amnesia/,
+ 'mystery.historical':/historical|19th century|victorian|period/,
+ 'mystery.sci-fi-mystery':/science fiction|time travel|alien/,
+ 'mystery.cozy':/cozy mystery|amateur detective/,
+ 'mystery.investigative-journalism':/journalist|investigative journalism|reporter|newspaper/,
+ 'mystery.unreliable-narrator':/unreliable narrator|twist ending|plot twist/,
+ 'horror.cult':/\bcult\b|sect|ritual/,
+ 'horror.isolation':/isolation|cabin|remote|snowbound|stranded/,
+ 'horror.analog-horror':/analog horror|vhs|found footage|creepypasta/,
+ 'horror.gothic':/gothic|castle|mansion|victorian/,
+ 'fantasy.dragons':/dragon/,
+ 'fantasy.magic-school':/magic school|school of magic|wizard school|academy/,
+ 'fantasy.grimdark':/grimdark|dark fantasy|brutal/,
+ 'fantasy.folklore':/folklore|fae|fairy|legend|myth/,
+ 'fantasy.coming-of-age':/coming of age|chosen one|young hero/,
+ 'action.assassin':/assassin|hitman|contract killer/,
+ 'action.siege':/siege|hostage|terrorist/,
+ 'action.bodyguard':/bodyguard|protector|protecting/,
+ 'action.action-comedy':/action comedy|buddy comedy/,
+ 'action.survival':/survival|stranded/,
+ 'action.prison-break':/prison escape|jailbreak|prison break/,
+ 'adventure.jungle':/jungle|rainforest|amazon/,
+ 'adventure.ocean-and-sea':/ocean|sea|ship|island|underwater|sailing/,
+ 'adventure.space-adventure':/outer space|space travel|spaceship|spacecraft/,
+ 'adventure.mountain-and-polar':/mountain|climbing|antarctic|arctic|everest|snow/,
+ 'adventure.historical':/historical|ancient|medieval|19th century/,
+ 'adventure.fantasy-quest':/magic|dragon|quest|wizard/,
+ 'adventure.coming-of-age':/coming of age|teenager|childhood/,
+ 'comedy.stand-up':/stand-up|stand up comedy|comedian/,
+ 'comedy.sketch':/sketch comedy|sketch/,
+ 'comedy.action-comedy':/action comedy/,
+ 'comedy.fish-out-of-water':/fish out of water|culture clash/,
+ 'comedy.coming-of-age':/coming of age|teenager/,
+ 'comedy.raunchy':/raunchy|sex comedy|gross-out/,
+ 'comedy.wholesome':/heartwarming|feel-good|wholesome/,
+ 'comedy.family':/family comedy|family/,
+ 'romance.romcom':/romantic comedy/,
+ 'romance.forbidden-love':/forbidden love|affair|star-crossed/,
+ 'romance.love-triangle':/love triangle/,
+ 'romance.long-distance':/long-distance|long distance/,
+ 'romance.holiday-romance':/christmas|holiday romance|summer romance/,
+ 'romance.wedding':/wedding|marriage proposal|bride/,
+ 'animation.sci-fi-animation':/science fiction|space|robot|cyberpunk/,
+ 'animation.fantasy-animation':/fantasy|magic|dragon|spirit/,
+ 'animation.superhero-animation':/superhero|based on comic/,
+ 'animation.musical-animation':/musical|song/,
+ 'animation.short-films':/short film|anthology/,
+ 'animation.experimental':/experimental|surreal|avant-garde/,
+ 'animation.animated-comedy':/comedy|sitcom|satire/,
+ 'animation.animated-drama':/drama|grief|coming of age/,
+ 'docu.investigative':/investigative|investigation|journalism|exposé/,
+ 'docu.business':/business|company|entrepreneur|economy|finance/,
+ 'docu.health-and-medicine':/health|medicine|medical|disease|mental health/,
+ 'docu.war-and-conflict':/war|conflict|military|soldier/,
+ 'docu.psychology':/psychology|human behavior|mind/,
+ 'docu.exploration':/exploration|expedition|adventure/,
+ 'war.korean-war':/korean war/,
+ 'war.napoleonic':/napoleon|napoleonic/,
+ 'war.naval':/navy|naval|submarine|battleship|warship/,
+ 'war.aerial':/pilot|air force|fighter jet|bomber|dogfight/,
+ 'war.prisoner-of-war':/prisoner of war|pow camp|prison camp/,
+ 'war.post-war':/post-war|aftermath of war|veteran|ptsd/,
+ 'war.espionage':/spy|espionage|intelligence/,
+ 'western.revenge-western':/revenge|vengeance/,
+ 'western.acid-western':/acid western|surreal|psychedelic/,
+ 'western.comedy-western':/western comedy|comedy/,
+ 'western.gold-rush':/gold rush|prospector|gold mine/,
+ 'western.lawman':/sheriff|marshal|lawman|bounty hunter/,
+ 'family.adventure':/adventure|quest|journey/,
+ 'family.comedy':/comedy|funny/,
+ 'family.sports':/sport|team|competition/,
+ 'family.magic-and-fantasy':/magic|fantasy|fairy|wizard/,
+ 'family.live-action-remake':/live action remake|remake/,
+ 'family.musical':/musical|song/,
+ 'family.friendship':/friendship|best friend/,
+ 'family.pets':/dog|cat|pet|puppy/,
+ 'music.rock':/rock|punk|metal|guitar/,
+ 'music.hip-hop':/hip-hop|hip hop|rap|rapper/,
+ 'music.jazz-and-blues':/jazz|blues/,
+ 'music.classical':/classical|orchestra|composer|pianist|opera/,
+ 'music.rise-to-fame':/fame|rise to fame|stardom|talent show/,
+ 'music.band-story':/band|bandmate|tour/,
+ 'music.electronic':/electronic music|dj|rave|techno/
 };
-const TG={878:['scifi'],28:['action'],12:['adventure'],16:['animation'],35:['comedy'],80:['crime'],99:['docu'],18:['drama'],14:['fantasy'],27:['horror'],9648:['mystery'],10749:['romance'],53:['thriller'],10752:['war'],37:['western'],36:['drama'],10759:['action','adventure'],10768:['war']};
+const TG={10751:['family'],10402:['music'],10762:['family'],878:['scifi'],28:['action'],12:['adventure'],16:['animation'],35:['comedy'],80:['crime'],99:['docu'],18:['drama'],14:['fantasy'],27:['horror'],9648:['mystery'],10749:['romance'],53:['thriller'],10752:['war'],37:['western'],36:['drama'],10759:['action','adventure'],10768:['war']};
 const FANT=/magic|dragon|wizard|witch|fairy|sword|sorcer|mytholog|vampire|werewolf|kingdom|elves|elf\b/;
 const slug=s=>s.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const SUB={},GEN={};
@@ -340,12 +466,18 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const IMG='https://image.tmdb.org/t/p/';
+/* built-in keys (scrambled only to keep them off screen; not secret) */
+const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
+const BUILTIN={tmdb:_d('=EzY3kzNxMmY0Y2M4MWMxgjZ0UWYkZzN3cTZhhjZ1I2M'),omdb:_d('=kzM4AzM4UGN')};
+const tmdbKey=()=>(cfg.key||'').trim()||BUILTIN.tmdb,omdbKey=()=>(cfg.omdb||'').trim()||BUILTIN.omdb;
 const LS='watchlog.items',LC='watchlog.cfg';
-let items=[],cfg={key:'',omdb:'',gh:'',gist:'',lastSync:0,dirty:false,posters:'dot',hidden:[]};
+let items=[],cfg={key:'',omdb:'',gh:'',gist:'',lastSync:0,dirty:false,posters:'color',hidden:[]};
 const ui={kind:'all',sort:'recent',g:'',s:'',q:''};
 
 /* ---------- storage (this phone only) ---------- */
-function load(){try{items=JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){items=[]}try{cfg={...cfg,...JSON.parse(localStorage.getItem(LC)||'{}')}}catch(e){}}
+function load(){try{items=JSON.parse(localStorage.getItem(LS)||'[]')}catch(e){items=[]}try{cfg={...cfg,...JSON.parse(localStorage.getItem(LC)||'{}')}}catch(e){}
+  if(cfg.posters!=='bw')cfg.posters='color';items.forEach(t=>delete t.dots);applyBW()}
+function applyBW(){document.documentElement.classList.toggle('bw',cfg.posters==='bw')}
 function persist(){try{localStorage.setItem(LS,JSON.stringify(items));return true}catch(e){toast('Phone storage is full');return false}}
 function saveCfg(){try{localStorage.setItem(LC,JSON.stringify(cfg))}catch(e){}}
 function upsert(t){items=items.filter(x=>x.id!==t.id).concat(t);persist();render();changed()}
@@ -363,7 +495,7 @@ async function findGist(){
   for(let page=1;page<=5;page++){const list=await gh('/gists?per_page=100&page='+page);
     const g=list.find(x=>x.description===GDESC&&x.files&&x.files[GFILE]);if(g){cfg.gist=g.id;saveCfg();return gh('/gists/'+g.id)}if(list.length<100)break}
   return null}
-const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[]},items:items.map(({dots,...t})=>t)});
+const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[]},items});
 async function push(){
   if(!cfg.gh||syncing)return;syncing=true;
   try{if(!cfg.lastSync){const arr=await pull().catch(e=>{if(e.code==='none')return null;throw e});if(arr)merge(arr)}
@@ -380,8 +512,8 @@ async function pull(){
   const d=JSON.parse(txt);return Array.isArray(d.items)?d.items:[]}
 function merge(arr){let n=0;const byId=new Map(items.map(t=>[String(t.id),t]));
   arr.forEach(t=>{if(!t||!t.id||!t.title)return;const id=String(t.id),mine=byId.get(id);
-    if(!mine||(t.updated||0)>(mine.updated||0)){byId.set(id,{...t,id,dots:mine&&mine.poster===t.poster?mine.dots:t.dots});n++}});
-  items=[...byId.values()];persist();render();fillDots();return n}
+    if(!mine||(t.updated||0)>(mine.updated||0)){byId.set(id,{...t,id});n++}});
+  items=[...byId.values()];persist();render();return n}
 const when=ts=>new Date(ts).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 function syncMsg(err){const m=$('#sSync');if(!m)return;m.className='';
   if(err){m.className='bad';m.textContent=err==='auth'?'GitHub didn\u2019t accept the token.':err==='offline'?'Offline — it will back up when you\u2019re connected.':'Backup failed — it will try again.';return}
@@ -406,31 +538,19 @@ function glyph(t){
     for(let y=r*20+4;y<r*20+16;y+=2)for(let x=c*20+4;x<c*20+16;x+=2)if(d[(y*200+x)*4+3]>120)n++;
     if(n>=13)out+=`<circle cx="${c+.5}" cy="${r+.5}" r=".4"/>`}
   gc.set(L,out);return out}
-const RAD=[.11,.17,.24,.31,.38,.46];
-function halftone(dots){let o='';for(let i=0;i<384;i++){const v=+dots[i]||0,x=i%16+.5,y=(i/16|0)+.5;o+=v?`<circle cx="${x}" cy="${y}" r="${RAD[v]}"/>`:`<circle class="z" cx="${x}" cy="${y}" r=".11"/>`}return o}
 function poster(t,size){
   const live=t.status==='watching'?'<i class="live"></i>':'';
-  if(cfg.posters==='photo'&&t.poster)return`<span class="pm ph"><img src="${IMG}${size||'w185'}${esc(t.poster)}" alt="" loading="lazy">${live}</span>`;
-  if(t.dots&&t.dots.length===384)return`<span class="pm ht"><svg viewBox="0 0 16 24" aria-hidden="true">${halftone(t.dots)}</svg>${live}</span>`;
+  if(t.poster)return`<span class="pm ph"><img src="${esc(imgSrc(t.poster,size||'w185'))}" alt="" loading="lazy">${live}</span>`;
   return`<span class="pm"><svg viewBox="0 0 10 15" aria-hidden="true">${glyph(t.title)}</svg>${live}</span>`}
-function makeDots(path){return new Promise(res=>{
-  if(!path)return res('');const im=new Image();im.crossOrigin='anonymous';
-  im.onload=()=>{try{const c=document.createElement('canvas');c.width=16;c.height=24;const x=c.getContext('2d');
-    const r=Math.max(16/im.width,24/im.height),w=im.width*r,h=im.height*r;x.imageSmoothingQuality='high';x.drawImage(im,(16-w)/2,(24-h)/2,w,h);
-    const d=x.getImageData(0,0,16,24).data,L=[];for(let i=0;i<d.length;i+=4)L.push(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2]);
-    const s=[...L].sort((a,b)=>a-b),mn=s[8],mx=s[375],sp=Math.max(1,mx-mn);
-    res(L.map(v=>Math.max(0,Math.min(5,Math.round((v-mn)/sp*5)))).join(''))}catch(e){res('')}};
-  im.onerror=()=>res('');im.src=IMG+'w185'+path})}
-const tried=new Set();
-async function fillDots(){for(const t of items.slice()){if(t.poster&&!t.dots&&!tried.has(t.id)){tried.add(t.id);const d=await makeDots(t.poster);if(d){const x=items.find(i=>i.id===t.id);if(x){x.dots=d;persist();render()}}}}}
+const imgSrc=(p,size)=>IMG+size+p;
 
 const kindL=k=>k==='series'?'Series':'Film';
-const mainCat=t=>{const s=(t.subs||[])[0];return s&&SUB[s]?SUB[s].l:(t.genres||[])[0]&&GEN[t.genres[0]]?GEN[t.genres[0]].n:''};
+const mainCat=t=>{const g=(t.genres||[]).find(x=>GEN[x]);return g?GEN[g].n:''};
 const metaOf=t=>[t.year,kindL(t.kind),mainCat(t)].filter(Boolean).join(' · ');
 
 /* ---------- TMDB ---------- */
 async function tm(path,params={}){
-  const k=(cfg.key||'').trim();if(!k)throw{code:'nokey'};
+  const k=tmdbKey();if(!k)throw{code:'nokey'};
   const u=new URL('https://api.themoviedb.org/3'+path);Object.entries(params).forEach(([a,b])=>u.searchParams.set(a,b));
   const h={accept:'application/json'};if(/^[0-9a-f]{32}$/i.test(k))u.searchParams.set('api_key',k);else h.Authorization='Bearer '+k;
   let r;try{r=await fetch(u,{headers:h})}catch(e){throw{code:'offline'}}
@@ -438,7 +558,10 @@ async function tm(path,params={}){
 function categorise(genreIds,text,lang){
   const g=new Set();genreIds.forEach(id=>(TG[id]||[]).forEach(x=>g.add(x)));
   if(genreIds.includes(10765)){g.add(FANT.test(text)&&!/science fiction|space|alien|robot|future|dystopi|time travel/.test(text)?'fantasy':'scifi')}
-  const subs=[];TAX.forEach(G=>{if(!g.has(G.id))return;let n=0;G.subs.forEach(s=>{if(n<3&&RX[s]&&RX[s].test(text)){subs.push(s);n++}})});
+  const parts=text.split('|').map(x=>x.trim()).filter(Boolean),cand=[];let order=0;
+  TAX.forEach(G=>{if(!g.has(G.id))return;G.subs.forEach(s=>{order++;if(!RX[s])return;const nm=SUB[s].l.toLowerCase().replace(/&/g,'and'),n=parts.filter(x=>RX[s].test(x)).length+(parts.some(x=>x.replace(/&/g,'and')===nm)?2:0);if(n)cand.push({s,n,o:order,g:G.id})})});
+  cand.sort((a,b)=>b.n-a.n||a.o-b.o);const per={},subs=[];
+  cand.forEach(c=>{if(subs.length<4&&(per[c.g]||0)<3&&(c.n>=2||!subs.length||(cand[0].n<2&&subs.length<2))){subs.push(c.s);per[c.g]=(per[c.g]||0)+1}});
   if(g.has('animation')&&lang==='ja'&&!subs.includes('animation.anime'))subs.unshift('animation.anime');
   return{genres:TAX.map(x=>x.id).filter(id=>g.has(id)),subs:subs.slice(0,5)}}
 async function details(r){
@@ -454,7 +577,7 @@ async function details(r){
   return{tmdb:d.id,kind:'film',title:d.title,year:parseInt(d.release_date)||'',runtime:d.runtime||'',seasons:'',creator:(d.credits?.crew||[]).filter(x=>x.job==='Director').map(x=>x.name).slice(0,2).join(', '),
     cast:(d.credits?.cast||[]).slice(0,3).map(x=>x.name),synopsis:d.overview||'',poster:d.poster_path||'',imdb:d.imdb_id||'',...c}}
 async function omdb(imdb){
-  const k=(cfg.omdb||'').trim();if(!k||!imdb)return null;
+  const k=omdbKey();if(!k||!imdb)return null;
   try{const r=await fetch('https://www.omdbapi.com/?i='+encodeURIComponent(imdb)+'&apikey='+encodeURIComponent(k));const d=await r.json();
     if(d.Response==='False')return d.Error&&/key/i.test(d.Error)?{err:'auth'}:null;
     const v=parseFloat(d.imdbRating);return isNaN(v)?null:{rating:v,votes:d.imdbVotes&&d.imdbVotes!=='N/A'?d.imdbVotes:''}}
@@ -481,7 +604,7 @@ function render(){
     rating:(x,y)=>(y.rating||0)-(x.rating||0)||String(x.title).localeCompare(String(y.title)),
     az:(x,y)=>String(x.title).localeCompare(String(y.title))};
   a=a.slice().sort(by[ui.sort]);
-  if(!items.length){$('#list').innerHTML=`<div class="empty">${poster({title:'W'})}<div>Nothing logged yet.</div><button class="btn" id="bFirst">Add your first title</button>${cfg.key?'':'<button class="ghost" id="bKey">Set up TMDB lookups</button>'}</div>`;return}
+  if(!items.length){$('#list').innerHTML=`<div class="empty">${poster({title:'W'})}<div>Nothing logged yet.</div><button class="btn" id="bFirst">Add your first title</button>${tmdbKey()?'':'<button class="ghost" id="bKey">Set up TMDB lookups</button>'}</div>`;return}
   if(!a.length){$('#list').innerHTML=`<div class="empty">${ui.kind==='queue'&&!ui.q?'Your queue is empty. Add a title and mark it “Want”.':'Nothing matches.'}</div>`;return}
   $('#list').innerHTML=a.map(t=>`<button class="row" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
 
@@ -514,8 +637,8 @@ let tt;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('on
 
 /* ---------- add ---------- */
 let lastRes=[];
-function openAdd(){$('#fq').value='';mode='fy';if(!cfg.key)$('#res').innerHTML=`<div class="msg">${ERR.nokey}<br><br><button class="btn line sm" id="bKey2">Open Settings</button></div>`;else showForYou();open('ovAdd')}
-$('#fq').addEventListener('input',e=>{if(!e.target.value.trim()&&cfg.key&&mode!=='fy'){mode='fy';showForYou()}});
+function openAdd(){$('#fq').value='';mode='fy';if(!tmdbKey())$('#res').innerHTML=`<div class="msg">${ERR.nokey}<br><br><button class="btn line sm" id="bKey2">Open Settings</button></div>`;else showForYou();open('ovAdd')}
+$('#fq').addEventListener('input',e=>{if(!e.target.value.trim()&&tmdbKey()&&mode!=='fy'){mode='fy';showForYou()}});
 $('#bAdd').addEventListener('click',openAdd);
 let busy=false;
 $('#fFind').addEventListener('submit',async e=>{
@@ -527,7 +650,7 @@ $('#fFind').addEventListener('submit',async e=>{
     if(yr)lastRes.sort((a,b)=>(b.yr===yr)-(a.yr===yr));
     lastRes=lastRes.slice(0,8);
     $('#res').innerHTML=lastRes.length?lastRes.map((r,i)=>{const kind=r.media_type==='tv'?'series':'film',have=items.some(t=>t.tmdb===r.id&&t.kind===kind);
-      const pv=r.poster_path?`<span class="pm ph"><img src="${IMG}w92${esc(r.poster_path)}" alt="" loading="lazy"></span>`:poster({title:r.title||r.name});
+      const pv=poster({title:r.title||r.name,poster:r.poster_path},'w154');
       return`<button class="rc" data-i="${i}">${pv}<span><b>${esc(r.title||r.name)}</b><small>${esc([r.yr,kindL(kind)].filter(Boolean).join(' · '))}</small><p>${esc(r.overview)}</p>${have?'<span class="tag">In your log</span>':''}</span></button>`}).join('')
       :'<div class="msg">No match on TMDB. Try another spelling, or enter it manually.</div>'}
   catch(err){$('#res').innerHTML=`<div class="msg">${ERR[err&&err.code]||ERR.http}</div>`}
@@ -543,7 +666,7 @@ $('#res').addEventListener('click',async e=>{
   const c=e.target.closest('.rc');if(!c||busy)return;const r=lastRes[+c.dataset.i],kind=r.media_type==='tv'?'series':'film';
   const ex=items.find(t=>t.tmdb===r.id&&t.kind===kind);if(ex){openEd(ex,false);return close('ovAdd')}
   busy=true;c.classList.add('busy');
-  try{const d=await details(r);const[dd]=await Promise.all([makeDots(d.poster),addImdb(d)]);d.dots=dd;openEd({...d,id:uid(),rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd')}
+  try{const d=await details(r);await addImdb(d);openEd({...d,id:uid(),rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd')}
   catch(err){toast(ERR[err&&err.code]||ERR.http)}
   c.classList.remove('busy');busy=false});
 $('#bManual').addEventListener('click',()=>{openEd({id:uid(),title:$('#fq').value.trim(),year:'',kind:'film',runtime:'',seasons:'',creator:'',cast:[],synopsis:'',genres:[],subs:[],rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd');if(!cur.title)openDet()});
@@ -563,7 +686,7 @@ async function recsFor(tmdb,kind){
   r=r.filter(x=>!x.adult).map(x=>({...x,media_type:x.media_type==='tv'||x.media_type==='movie'?x.media_type:type}));recCache.set(key,r);return r}
 async function openTmdb(c,keep){
   const ex=inLog(c);if(ex){openEd(ex,false,keep);return}
-  const d=await details(c);const[dd]=await Promise.all([makeDots(d.poster),addImdb(d)]);d.dots=dd;
+  const d=await details(c);await addImdb(d);
   openEd({...d,id:uid(),rating:0,status:'want',date:'',thoughts:''},true,keep)}
 async function buildForYou(){
   const seen=items.filter(t=>t.tmdb&&t.status!=='want');
@@ -597,7 +720,7 @@ function drawForYou(){
   fyShown=(fyG?L.filter(e=>e.gen.includes(fyG)):L).slice(0,20);
   $('#res').innerHTML=`<div class="fy"><span>For you</span><span>${fyShown.length}</span></div>`+
     (gs.length>1?`<div class="chips">${`<button class="chip ${fyG?'':'on'}" data-fg="">All</button>`+gs.map(g=>`<button class="chip ${fyG===g?'on':''}" data-fg="${g}">${GEN[g].n}</button>`).join('')}</div>`:'')+
-    fyShown.map((e,i)=>{const c=e.c,pv=c.poster_path?`<span class="pm ph"><img src="${IMG}w92${esc(c.poster_path)}" alt="" loading="lazy"></span>`:poster({title:ctitle(c)});
+    fyShown.map((e,i)=>{const c=e.c,pv=poster({title:ctitle(c),poster:c.poster_path},'w154');
       return`<div class="rc sug" role="button" tabindex="0" data-i="${i}">${pv}<span><b>${esc(ctitle(c))}</b><small>${esc([cyear(c),kindL(ckind(c)),e.gen.map(g=>GEN[g].n).slice(0,2).join(', ')].filter(Boolean).join(' · '))}</small><span class="why">Because you liked ${esc(e.because)}</span></span><button class="x" data-k="${esc(e.key)}" aria-label="Not interested">×</button></div>`}).join('')}
 
 /* similar sheet */
@@ -605,7 +728,7 @@ let simList=[];
 $('#bSim').addEventListener('click',async()=>{
   if(!cur||!cur.tmdb)return;const g=$('#simGrid');g.innerHTML='<div class="load" style="grid-column:1/-1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';open('shSim');
   try{simList=(await recsFor(cur.tmdb,cur.kind)).filter(c=>!(c.id===cur.tmdb&&ckind(c)===cur.kind)).slice(0,18);
-    g.innerHTML=simList.length?simList.map((c,i)=>{const have=inLog(c),pv=have?poster(have):c.poster_path?`<span class="pm ph"><img src="${IMG}w185${esc(c.poster_path)}" alt="" loading="lazy"></span>`:poster({title:ctitle(c)});
+    g.innerHTML=simList.length?simList.map((c,i)=>{const have=inLog(c),pv=poster(have||{title:ctitle(c),poster:c.poster_path},'w185');
       return`<button class="gi" data-i="${i}">${pv}<b>${esc(ctitle(c))}</b><small>${esc(cyear(c))}${have?` · <em>${have.status==='want'?'Queued':have.rating?have.rating+'/10':'Logged'}</em>`:''}</small></button>`}).join('')
       :'<div class="msg" style="grid-column:1/-1">TMDB has no similar titles for this one yet.</div>'}
   catch(e){g.innerHTML=`<div class="msg" style="grid-column:1/-1">${ERR[e&&e.code]||ERR.http}</div>`}});
@@ -621,7 +744,7 @@ function edBack(){if(!edPrev.length)return false;const p=edPrev.pop();cur=p.cur;
 const edDirty=()=>cur&&JSON.stringify({...cur,thoughts:$('#eTh').value})!==snap0;
 function openEd(t,n,keep){if(!keep)edPrev=[];cur=JSON.parse(JSON.stringify(t));cur.cast=cur.cast||[];cur.thoughts=cur.thoughts||'';cur.genres=cur.genres||[];cur.subs=cur.subs||[];isNew=n;
   snap0=JSON.stringify(cur);$('#eTh').value=cur.thoughts;$('#bDel').hidden=n;$('#bSim').hidden=!cur.tmdb;armX(false);armDel(false);renderEd();$('.ed').scrollTop=0;open('ovEd');
-  if(!n&&cur.imdb&&!cur.imdbRating&&cfg.omdb){const id=cur.id,imdb=cur.imdb;omdb(imdb).then(o=>{if(!o||!o.rating)return;const x=items.find(i=>i.id===id);if(x){x.imdbRating=o.rating;x.imdbVotes=o.votes;persist()}
+  if(!n&&cur.imdb&&!cur.imdbRating&&omdbKey()){const id=cur.id,imdb=cur.imdb;omdb(imdb).then(o=>{if(!o||!o.rating)return;const x=items.find(i=>i.id===id);if(x){x.imdbRating=o.rating;x.imdbVotes=o.votes;persist()}
     if(cur&&cur.id===id){cur.imdbRating=o.rating;cur.imdbVotes=o.votes;snap0=JSON.stringify({...JSON.parse(snap0),imdbRating:o.rating,imdbVotes:o.votes});renderEd()}})}}
 function renderEd(){
   if(!cur)return;
@@ -649,7 +772,11 @@ $('#bSave').addEventListener('click',()=>{
 $('#bDel').addEventListener('click',()=>{if(!dArm)return armDel(true);removeItem(cur.id);toast('Deleted');if(edBack())return;close('ovEd');cur=null});
 
 /* ---------- categories ---------- */
-$('#eCats').addEventListener('click',()=>{catG=cur.genres[0]||'scifi';renderCats();open('shCat')});
+$('#eCats').addEventListener('click',()=>{catG=cur.genres[0]||'scifi';$('#bAuto').hidden=!cur.tmdb;renderCats();open('shCat')});
+$('#bAuto').addEventListener('click',async()=>{if(!cur||!cur.tmdb)return;const b=$('#bAuto');b.disabled=true;b.textContent='Detecting…';
+  try{const d=await details({id:cur.tmdb,media_type:cur.kind==='series'?'tv':'movie'});cur.genres=d.genres;cur.subs=d.subs;catG=cur.genres[0]||catG;renderCats();toast('Categories updated from TMDB')}
+  catch(e){toast(ERR[e&&e.code]||ERR.http)}
+  b.disabled=false;b.textContent='Auto-detect from TMDB'});
 function renderCats(){
   const sel=new Set(cur.subs),gs=new Set(cur.genres);
   $('#cTabs').innerHTML=TAX.map(g=>{const n=g.subs.filter(s=>sel.has(s)).length||(gs.has(g.id)?1:0);return`<button class="chip ${g.id===catG?'on':''}" data-g="${g.id}">${g.n}${n?`<i>${n}</i>`:''}</button>`}).join('');
@@ -682,11 +809,11 @@ function openSet(){$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$
 $('#bSet').addEventListener('click',openSet);
 $('#sKey').addEventListener('input',e=>{cfg.key=e.target.value.trim();saveCfg();$('#sKeyMsg').textContent=''});
 $('#sOmdb').addEventListener('input',e=>{cfg.omdb=e.target.value.trim();saveCfg();$('#sOmdbMsg').textContent=''});
-$('#bTestO').addEventListener('click',async()=>{const m=$('#sOmdbMsg');m.className='';if(!cfg.omdb){m.textContent='Paste a key first';m.className='bad';return}m.textContent='Checking…';
-  const o=await omdb('tt0816692');if(o&&o.rating){m.textContent='Connected';m.className='ok'}else{m.textContent=o&&o.err?'Key not accepted':'No answer — check the key or connection';m.className='bad'}});
+$('#bTestO').addEventListener('click',async()=>{const m=$('#sOmdbMsg');m.className='';if(!omdbKey()){m.textContent='Paste a key first';m.className='bad';return}m.textContent='Checking…';
+  const o=await omdb('tt0816692');if(o&&o.rating){m.textContent=cfg.omdb?'Your key works':'Built-in key works';m.className='ok'}else{m.textContent=o&&o.err?'Key not accepted':'No answer — check the key or connection';m.className='bad'}});
 $('#bTest').addEventListener('click',async()=>{const m=$('#sKeyMsg');m.className='';m.textContent='Checking…';
-  try{await tm('/configuration');m.textContent='Connected';m.className='ok'}catch(e){m.textContent=e.code==='nokey'?'Paste a key first':e.code==='offline'?'No connection':'Key not accepted';m.className='bad'}});
-$('#sPost').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;cfg.posters=b.dataset.p;saveCfg();
+  try{await tm('/configuration');m.textContent=cfg.key?'Your key works':'Built-in key works';m.className='ok'}catch(e){m.textContent=e.code==='nokey'?'Paste a key first':e.code==='offline'?'No connection':'Key not accepted';m.className='bad'}});
+$('#sPost').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;cfg.posters=b.dataset.p;saveCfg();applyBW();
   document.querySelectorAll('#sPost button').forEach(x=>x.classList.toggle('on',x.dataset.p===cfg.posters));render()});
 $('#sGh').addEventListener('change',e=>{const v=e.target.value.trim();if(v===cfg.gh)return;cfg.gh=v;cfg.gist='';cfg.lastSync=0;saveCfg();syncMsg()});
 $('#bSync').addEventListener('click',async()=>{if(!cfg.gh)return toast('Paste a GitHub token first');$('#sSync').textContent='Backing up…';
@@ -703,13 +830,12 @@ $('#bImp').addEventListener('click',()=>$('#fImp').click());
 $('#fImp').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
   try{const d=JSON.parse(await f.text()),arr=Array.isArray(d)?d:d.items;if(!Array.isArray(arr))throw 0;
     const ok=arr.filter(t=>t&&typeof t==='object'&&t.id&&t.title);const ids=new Set(ok.map(t=>String(t.id)));
-    items=items.filter(t=>!ids.has(String(t.id))).concat(ok.map(t=>({...t,id:String(t.id)})));persist();render();openSet();toast(`Imported ${ok.length} titles`);fillDots();changed()}
+    items=items.filter(t=>!ids.has(String(t.id))).concat(ok.map(t=>({...t,id:String(t.id)})));persist();render();openSet();toast(`Imported ${ok.length} titles`);changed()}
   catch(err){toast('That file isn’t a Watchlog backup')}});
 
 /* ---------- start ---------- */
 load();render();
 document.fonts&&document.fonts.ready.then(()=>{gc.clear();render();renderEd()});
-setTimeout(fillDots,1500);
 if(cfg.gh&&cfg.dirty)setTimeout(()=>push().catch(()=>{}),3000);
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
