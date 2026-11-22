@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Watchlog</title>
-<meta name="version" content="alpha 0.0.1">
+<meta name="version" content="alpha 0.0.2">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -40,8 +40,9 @@ button:disabled{opacity:.5}
 .seg{display:flex;background:var(--card);border-radius:22px;padding:3px;flex:1}
 .seg button{flex:1;height:36px;border-radius:18px;font-size:14px;font-weight:500;color:var(--mute);white-space:nowrap;padding:0 2px}
 #kindSeg button{font-size:13px}
+@media (max-width:380px){.bar{gap:6px}.bar .sort{width:78px;font-size:13px}#kindSeg button{font-size:12px;padding:0 1px}}
 .seg button.on{background:var(--ink);color:var(--bg)}
-.sort{height:42px;padding:0 14px;border-radius:21px;background:var(--card);font:700 14px var(--dot);text-transform:uppercase;white-space:nowrap}
+.sort{height:42px;width:92px;flex:none;padding:0;text-align:center;border-radius:21px;background:var(--card);font:700 14px var(--dot);text-transform:uppercase;white-space:nowrap}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;flex:none}
 .chips::-webkit-scrollbar{display:none}
 .chips:empty{display:none}
@@ -248,7 +249,7 @@ input.lname{font:700 24px var(--sans);width:100%}
 :root[data-layout=desk] .bar{flex-direction:column;align-items:stretch;gap:8px}
 :root[data-layout=desk] .seg button{height:32px;font-size:13px}
 :root[data-layout=desk] #kindSeg button{font-size:12px}
-:root[data-layout=desk] .sort{height:34px;align-self:flex-start;font-size:13px}
+:root[data-layout=desk] .sort{height:34px;width:84px;align-self:flex-start;font-size:13px}
 :root[data-layout=desk] #side .chips{flex-direction:column;overflow:visible;gap:2px;padding:4px 8px 10px}
 :root[data-layout=desk] #side .chip{height:34px;border:0;border-radius:8px;justify-content:space-between;padding:0 10px;font-size:14px}
 :root[data-layout=desk] #side .chips.sub{border-top:1px solid var(--line);margin:0 16px;padding:8px 0}
@@ -649,7 +650,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const VERSION='alpha 0.0.1';
+const VERSION='alpha 0.0.2';
 const IMG='https://image.tmdb.org/t/p/';
 /* built-in keys (scrambled only to keep them off screen; not secret) */
 const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
@@ -778,7 +779,7 @@ function base(){let a=items;if(ui.kind==='lists')return[];if(ui.kind==='queue')r
 let listOrder=[];
 const fmtDate=d=>{if(!d)return'';const x=new Date(d+'T12:00');return isNaN(x)?'':x.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'2-digit'})};
 function render(){
-  $('#bSort').hidden=false;
+  $('#bSort').textContent=sortLabel();
   if(ui.kind==='lists'){$('#gChips').innerHTML='';$('#sChips').innerHTML='';listOrder=[];renderLists();return}
   const b=base();
   const gs=TAX.filter(g=>b.some(t=>(t.genres||[]).includes(g.id)));
@@ -802,7 +803,11 @@ function render(){
 $('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;if(k==='lists'&&ui.kind==='lists'){ui.list=null;ui.listEdit=false}ui.kind=k;ui.g='';ui.s='';if(k==='lists')endSelect();
   document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();$('#list').scrollTop=0});
 const SORTS=['recent','rating','az'],SL={recent:'Recent',rating:'Rating',az:'A–Z'};
-$('#bSort').addEventListener('click',()=>{ui.sort=SORTS[(SORTS.indexOf(ui.sort)+1)%3];$('#bSort').textContent=SL[ui.sort];render()});
+const LSORTS=['recent','rating','az'],DSORTS=['custom','rating','az'];SL.custom='Custom';
+ui.lsort='recent';ui.dsort='custom';
+const sortCtx=()=>ui.kind!=='lists'?'sort':ui.list?'dsort':'lsort';
+function sortLabel(){return SL[ui[sortCtx()]]}
+$('#bSort').addEventListener('click',()=>{const k=sortCtx(),o=k==='sort'?SORTS:k==='lsort'?LSORTS:DSORTS;ui[k]=o[(o.indexOf(ui[k])+1)%o.length];if(k==='dsort'&&ui.dsort!=='custom')ui.listEdit=false;render()});
 $('#gChips').addEventListener('click',e=>{const c=e.target.closest('[data-g]');if(!c)return;ui.g=ui.g===c.dataset.g?'':c.dataset.g;ui.s='';render()});
 $('#sChips').addEventListener('click',e=>{const c=e.target.closest('[data-s]');if(!c)return;ui.s=ui.s===c.dataset.s?'':c.dataset.s;render()});
 $('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hidden=false;$('#q').focus()});
@@ -1044,18 +1049,26 @@ const resolve=e=>items.find(i=>(e.tmdb&&i.tmdb===e.tmdb&&i.kind===e.kind)||(e.lo
 function newList(name,entries){const L={id:uid(),name:name.trim().slice(0,80)||'Untitled list',items:[],created:Date.now(),updated:Date.now()};(entries||[]).forEach(e=>addToList(L,e,true));lists.unshift(L);saveLists();return L}
 function addToList(L,e,quiet){if(L.items.some(x=>x.key===e.key))return false;L.items.push({...e});L.updated=Date.now();if(!quiet)saveLists();return true}
 function listPosters(L){return L.items.slice(0,4).map(e=>{const r=resolve(e)||e;return poster({title:r.title,poster:r.poster},'w92')}).join('')}
+const listAvg=L=>{const r=L.items.map(e=>(resolve(e)||{}).rating).filter(Boolean);return r.length?r.reduce((a,b)=>a+b,0)/r.length:0};
+function sortedLists(){const a=lists.slice();
+  if(ui.lsort==='az')a.sort((x,y)=>x.name.localeCompare(y.name));
+  else if(ui.lsort==='rating')a.sort((x,y)=>listAvg(y)-listAvg(x)||(y.updated||0)-(x.updated||0));
+  else a.sort((x,y)=>(y.updated||0)-(x.updated||0));return a}
 function renderLists(){
-  const box=$('#list');$('#bSort').hidden=true;
+  const box=$('#list');
   if(ui.list){const L=lists.find(x=>x.id===ui.list);if(!L){ui.list=null}else return renderListDetail(L,box)}
   box.innerHTML=`<div class="lnew"><input id="nlName" placeholder="New list name" maxlength="80" autocomplete="off" enterkeyhint="done"><button class="btn sm" id="nlGo">Create</button></div>`+
-    (lists.length?lists.map(L=>`<button class="lc" data-list="${esc(L.id)}"><span class="lp">${listPosters(L)||poster({title:L.name})}</span><span class="lt"><b>${esc(L.name)}</b><small>${L.items.length} title${L.items.length===1?'':'s'} · ${esc(fmtDate(new Date(L.updated).toISOString().slice(0,10)))}</small></span><span class="chev">›</span></button>`).join('')
+    (lists.length?sortedLists().map(L=>`<button class="lc" data-list="${esc(L.id)}"><span class="lp">${listPosters(L)||poster({title:L.name})}</span><span class="lt"><b>${esc(L.name)}</b><small>${L.items.length} title${L.items.length===1?'':'s'}${listAvg(L)?' · avg '+listAvg(L).toFixed(1):''} · ${esc(fmtDate(new Date(L.updated).toISOString().slice(0,10)))}</small></span><span class="chev">›</span></button>`).join('')
     :`<div class="empty" style="height:auto;padding-top:40px">No lists yet. Create one above, or long-press titles in your log${layout==='desk'?' (or Ctrl-click them)':''} to select several and add them to a list.</div>`)}
+function detailOrder(L,ed){const idx=L.items.map((_,i)=>i);if(ed||ui.dsort==='custom')return idx;
+  const info=i=>{const e=L.items[i],r=resolve(e);return{t:String((r||e).title||''),r:(r&&r.rating)||0}};
+  return ui.dsort==='az'?idx.sort((a,b)=>info(a).t.localeCompare(info(b).t)):idx.sort((a,b)=>info(b).r-info(a).r||info(a).t.localeCompare(info(b).t))}
 function renderListDetail(L,box){
   const ed=ui.listEdit;
   box.innerHTML=`<div class="lh"><button class="ghost" data-act="back">‹ Lists</button><span class="lha">${ed?`<button class="ghost del" data-act="dellist">${ui.delArm?'Tap again to delete':'Delete list'}</button><button class="btn ink sm" data-act="done">Done</button>`:`<button class="ghost" data-act="edit">Edit</button><button class="btn sm" data-act="sharelist">Share</button>`}</span></div>`+
     (ed?`<input class="lname" id="lnInput" value="${esc(L.name)}" maxlength="80">`:`<h2 class="lname">${esc(L.name)}</h2>`)+
     `<p class="lsub">${L.items.length} title${L.items.length===1?'':'s'}${ed?' · use the arrows to reorder':''}</p>`+
-    (L.items.length?L.items.map((e,i)=>{const r=resolve(e),t=r||e;
+    (L.items.length?detailOrder(L,ed).map(i=>{const e=L.items[i],r=resolve(e),t=r||e;
       const right=ed?`<span class="lact"><button class="ib" data-act="up" data-i="${i}" aria-label="Move up">↑</button><button class="ib" data-act="down" data-i="${i}" aria-label="Move down">↓</button><button class="ib" data-act="rm" data-i="${i}" aria-label="Remove">×</button></span>`
         :`<span class="sc ${r&&r.rating?'':'no'}">${r&&r.rating?r.rating:'·'}</span>`;
       return`<div class="row lrow" role="button" tabindex="0" data-entry="${i}">${poster({title:t.title,poster:t.poster,status:r&&r.status})}<span class="rt"><b>${esc(t.title)}</b><small>${esc([t.year,kindL(t.kind)].filter(Boolean).join(' · '))}${r?(r.status==='want'?' · <em>Queued</em>':''):' · Not in your log'}</small></span>${right}</div>`}).join('')
@@ -1105,11 +1118,11 @@ $('#list').addEventListener('contextmenu',e=>{if(ui.kind==='lists')return;const 
 /* list view clicks */
 function listClick(e){
   const nl=e.target.closest('#nlGo');if(nl){const v=$('#nlName').value.trim();if(!v){$('#nlName').focus();return true}newList(v);render();toast('List created');return true}
-  const lc=e.target.closest('[data-list]');if(lc){ui.list=lc.dataset.list;ui.listEdit=false;ui.delArm=false;render();$('#list').scrollTop=0;return true}
+  const lc=e.target.closest('[data-list]');if(lc){ui.list=lc.dataset.list;ui.dsort='custom';ui.listEdit=false;ui.delArm=false;render();$('#list').scrollTop=0;return true}
   const L=lists.find(x=>x.id===ui.list);const a=e.target.closest('[data-act]');
   if(a&&L){const act=a.dataset.act,i=+a.dataset.i;
     if(act==='back'){ui.list=null;ui.listEdit=false;render()}
-    else if(act==='edit'){ui.listEdit=true;ui.delArm=false;render()}
+    else if(act==='edit'){ui.listEdit=true;ui.dsort='custom';ui.delArm=false;render()}
     else if(act==='done'){const v=($('#lnInput')?.value||'').trim();if(v&&v!==L.name){L.name=v.slice(0,80);L.updated=Date.now()}ui.listEdit=false;saveLists();render()}
     else if(act==='dellist'){if(!ui.delArm){ui.delArm=true;render();return true}lists=lists.filter(x=>x!==L);saveLists();ui.list=null;ui.listEdit=false;ui.delArm=false;render();toast('List deleted')}
     else if(act==='sharelist')shareListSheet(L);
