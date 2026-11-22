@@ -1,4 +1,4 @@
-WATCHLOG alpha 0.0.2 — install on your phone
+WATCHLOG alpha 0.0.3 — install on your phone
 
 WATCHLOG — install on your phone
 
