@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Watchlog</title>
-<meta name="version" content="alpha 0.0.4">
+<meta name="version" content="alpha 0.0.5">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -162,32 +162,6 @@ button:disabled{opacity:.5}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:.25s;z-index:40;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 [hidden]{display:none!important}
-/* ===== phone: controls in a bottom bar, title scrolls away ===== */
-#scroller{display:contents}
-#pHead,#pBar{display:none}
-:root[data-layout=phone] #scroller{display:block;flex:1;overflow-y:auto;overscroll-behavior:contain;min-height:0}
-:root[data-layout=phone] .list{overflow:visible;flex:none;padding-bottom:calc(var(--pbh,240px) + 16px)}
-:root[data-layout=phone] #side{display:none}
-:root[data-layout=phone] #pHead{display:block;padding-top:calc(12px + env(safe-area-inset-top))}
-#pBar .logo{font-size:22px;padding:2px 0 0;flex:none}
-#pBar .chips{margin:0 -16px;padding:0 16px}
-#pBar .chips.sub{margin-top:-2px}
-:root[data-layout=phone] #pBar{display:flex;flex-direction:column;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:6;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
-  background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);
-  transition:transform .25s cubic-bezier(.2,.8,.2,1)}
-:root[data-layout=phone] #pBar.away{transform:translateY(calc(100% + 4px))}
-#pRow{display:flex;align-items:center;gap:4px}
-#pRow .grow{flex:1}
-#pRow .sort{margin-left:4px}
-#pBar #topB{padding:0;min-height:48px;gap:6px}
-#pBar.searching #pRow{display:none}
-#pBar .seg{flex:none}
-.selecting #pBar{display:none!important}
-:root[data-layout=phone] #q::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
-:root[data-layout=phone] .toast{bottom:calc(var(--pbh,240px) + 12px)}
-:root[data-layout=phone] #pBar.away~.toast{bottom:calc(24px + env(safe-area-inset-bottom))}
-@media (prefers-reduced-motion:reduce){#pBar{transition:none}}
-
 /* lists + sharing */
 .row{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .selecting .row[data-id] .pm{outline:2px solid var(--dim);outline-offset:2px}
@@ -327,9 +301,8 @@ input.lname{font:700 24px var(--sans);width:100%}
   <div class="note" id="note"></div>
   <div class="side-ft"><button class="ghost" id="bKeys">Keyboard shortcuts <span class="kbd">?</span></button></div>
  </div>
-  <div id="scroller"><div id="pHead"></div><main class="list" id="list"></main></div>
+  <main class="list" id="list"></main>
 </div>
-<nav id="pBar" aria-label="Controls"><div id="pRow"><span class="grow"></span></div></nav>
 <div id="scrim"></div>
 
 <section class="ov" id="ovAdd" aria-label="Add title">
@@ -677,7 +650,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const VERSION='alpha 0.0.4';
+const VERSION='alpha 0.0.5';
 const IMG='https://image.tmdb.org/t/p/';
 /* built-in keys (scrambled only to keep them off screen; not secret) */
 const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
@@ -828,7 +801,7 @@ function render(){
   $('#list').innerHTML=a.map(t=>`<button class="row${cur&&cur.id===t.id?' sel':''}${sel.has(t.id)?' pick':''}" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="xc">${t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''}</span><span class="xc">${t.status==='want'?'Queued':esc(fmtDate(t.date))}</span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
 
 $('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;if(k==='lists'&&ui.kind==='lists'){ui.list=null;ui.listEdit=false}ui.kind=k;ui.g='';ui.s='';if(k==='lists')endSelect();
-  document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();scrollBox().scrollTop=0});
+  document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();$('#list').scrollTop=0});
 const SORTS=['recent','rating','az'],SL={recent:'Recent',rating:'Rating',az:'A–Z'};
 const LSORTS=['recent','rating','az'],DSORTS=['custom','rating','az'];SL.custom='Custom';
 ui.lsort='recent';ui.dsort='custom';
@@ -837,8 +810,8 @@ function sortLabel(){return SL[ui[sortCtx()]]}
 $('#bSort').addEventListener('click',()=>{const k=sortCtx(),o=k==='sort'?SORTS:k==='lsort'?LSORTS:DSORTS;ui[k]=o[(o.indexOf(ui[k])+1)%o.length];if(k==='dsort'&&ui.dsort!=='custom')ui.listEdit=false;render()});
 $('#gChips').addEventListener('click',e=>{const c=e.target.closest('[data-g]');if(!c)return;ui.g=ui.g===c.dataset.g?'':c.dataset.g;ui.s='';render()});
 $('#sChips').addEventListener('click',e=>{const c=e.target.closest('[data-s]');if(!c)return;ui.s=ui.s===c.dataset.s?'':c.dataset.s;render()});
-$('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hidden=false;$('#pBar').classList.add('searching');$('#pBar').classList.remove('away');$('#q').focus()});
-$('#bSearchX').addEventListener('click',()=>{ui.q='';$('#q').value='';$('#topB').hidden=true;$('#topA').hidden=false;$('#pBar').classList.remove('searching');render()});
+$('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hidden=false;$('#q').focus()});
+$('#bSearchX').addEventListener('click',()=>{ui.q='';$('#q').value='';$('#topB').hidden=true;$('#topA').hidden=false;render()});
 $('#q').addEventListener('input',e=>{ui.q=e.target.value.trim();render()});
 $('#list').addEventListener('click',e=>{if(e.target.closest('#bFirst'))return openAdd();if(e.target.closest('#bKey'))return openSet();
   if(ui.kind==='lists'){listClick(e);return}
@@ -1145,7 +1118,7 @@ $('#list').addEventListener('contextmenu',e=>{if(ui.kind==='lists')return;const 
 /* list view clicks */
 function listClick(e){
   const nl=e.target.closest('#nlGo');if(nl){const v=$('#nlName').value.trim();if(!v){$('#nlName').focus();return true}newList(v);render();toast('List created');return true}
-  const lc=e.target.closest('[data-list]');if(lc){ui.list=lc.dataset.list;ui.dsort='custom';ui.listEdit=false;ui.delArm=false;render();scrollBox().scrollTop=0;return true}
+  const lc=e.target.closest('[data-list]');if(lc){ui.list=lc.dataset.list;ui.dsort='custom';ui.listEdit=false;ui.delArm=false;render();$('#list').scrollTop=0;return true}
   const L=lists.find(x=>x.id===ui.list);const a=e.target.closest('[data-act]');
   if(a&&L){const act=a.dataset.act,i=+a.dataset.i;
     if(act==='back'){ui.list=null;ui.listEdit=false;render()}
@@ -1305,33 +1278,13 @@ function applyLayout(){
   const L=pickLayout(),prev=layout;
   document.documentElement.classList.toggle('short',innerHeight<520);
   if(L===prev&&document.documentElement.dataset.layout)return;
-  layout=L;document.documentElement.dataset.layout=L;placeControls(L);
+  layout=L;document.documentElement.dataset.layout=L;
   const ed=$('#ovEd');
   if(L==='phone'){ed.classList.remove('none');if(cur){ed.classList.add('open');if(!stack.includes('ovEd')){if(!stack.length&&!pushed){try{history.pushState({w:1},'');pushed=true}catch(e){}}stack.push('ovEd')}}else ed.classList.remove('open')}
   else{const i=stack.indexOf('ovEd');if(i>=0){stack.splice(i,1);if(!stack.length&&pushed){pushed=false;popSkip++;history.back()}}ed.classList.remove('open');
     if($('#ovAdd').classList.contains('open'))$('#scrim').classList.add('on')}
-  if(L!=='desk'&&ui.q==='')$('#topB').hidden=true;$('#pBar').classList.toggle('searching',!$('#topB').hidden);
+  if(L!=='desk'&&ui.q==='')$('#topB').hidden=true;
   renderEd();render()}
-/* move the controls between the top/sidebar (tablet, PC) and the bottom bar (phone) */
-function placeControls(L){
-  const logo=document.querySelector('.logo'),topA=$('#topA'),topB=$('#topB'),bar=document.querySelector('.bar'),side=$('#side'),pRow=$('#pRow'),pBar=$('#pBar'),pHead=$('#pHead');
-  if(L==='phone'){
-    pHead.append($('#note'));
-    pRow.prepend($('#bSearch'),$('#bSet'),$('#bSort'));pRow.append($('#bAdd'));
-    pBar.append(logo,$('#gChips'),$('#sChips'),pRow,topB,$('#kindSeg'));
-  }else{
-    topA.prepend(logo);topA.append($('#bSearch'),$('#bSet'),$('#bAdd'));
-    bar.append($('#kindSeg'),$('#bSort'));
-    side.insertBefore(topB,bar);side.insertBefore($('#gChips'),side.querySelector('.side-ft'));side.insertBefore($('#sChips'),side.querySelector('.side-ft'));side.insertBefore($('#note'),side.querySelector('.side-ft'));
-    pBar.classList.remove('away')}
-  pBar.classList.toggle('searching',!topB.hidden)}
-const scrollBox=()=>layout==='phone'?$('#scroller'):$('#list');
-let lastY=0;
-new ResizeObserver(()=>{const h=$('#pBar').offsetHeight;if(h)document.documentElement.style.setProperty('--pbh',h+'px')}).observe($('#pBar'));
-$('#scroller').addEventListener('scroll',()=>{if(layout!=='phone')return;const y=$('#scroller').scrollTop,d=y-lastY,b=$('#pBar');
-  if(b.classList.contains('searching')){lastY=y;return}
-  if(y<40||d<-6)b.classList.remove('away');else if(d>6)b.classList.add('away');
-  lastY=y},{passive:true});
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(applyLayout,120)});
 matchMedia('(pointer:fine)').addEventListener?.('change',applyLayout);
 
