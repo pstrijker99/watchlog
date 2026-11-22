@@ -1,5 +1,5 @@
 // Watchlog service worker: keeps the app usable offline.
-const SHELL = 'watchlog-shell-v1';
+const SHELL = 'watchlog-shell-v2';
 const RUNTIME = 'watchlog-runtime-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable.png'];
 

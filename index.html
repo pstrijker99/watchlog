@@ -93,6 +93,18 @@ button:disabled{opacity:.5}
 .load span:nth-child(2){animation-delay:.1s}.load span:nth-child(3){animation-delay:.2s}.load span:nth-child(4){animation-delay:.3s}.load span:nth-child(5){animation-delay:.4s}.load span:nth-child(6){animation-delay:.5s}.load span:nth-child(7){animation-delay:.6s}
 @keyframes pl{0%,60%,100%{background:var(--dim)}20%{background:var(--red)}}
 @media (prefers-reduced-motion:reduce){.load span{animation:none}.ov,.ov.open{transition:none}}
+.rc{position:relative}
+.rc .why{display:block;font-size:13px;color:var(--mute);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc>span{flex:1}
+.rc .x{position:absolute;top:4px;right:4px;width:40px;height:40px;display:grid;place-items:center;color:var(--mute);font-size:20px;line-height:1}
+.rc.sug{padding-right:40px}
+.fy{display:flex;justify-content:space-between;align-items:baseline;font:700 13px var(--dot);color:var(--mute);text-transform:uppercase;margin:2px 0 8px}
+.res .chips{margin:0 -16px;padding:0 16px 10px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px;overflow-y:auto;padding-bottom:12px}
+.gi{text-align:left;display:flex;flex-direction:column;gap:6px}
+.gi b{font-size:13px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gi small{font:700 12px var(--dot);color:var(--mute)}
+.gi small em{font-style:normal;color:var(--red)}
 .msg{color:var(--mute);text-align:center;padding:28px 8px;font-size:15px}
 /* editor */
 .ed{flex:1;display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-bottom:8px}
@@ -174,7 +186,7 @@ button:disabled{opacity:.5}
   <div class="pane">
     <div class="ph"><h2>Add</h2><button class="ib" data-close="ovAdd" aria-label="Close"><svg viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:1.8;fill:none"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <form class="find" id="fFind"><input id="fq" placeholder="Title, e.g. Arrival 2016" autocomplete="off" enterkeyhint="search"><button class="btn" id="bFind">Find</button></form>
-    <p class="hint" id="fHint">Searches TMDB for films and series. Add a year to narrow it down.</p>
+    <p class="hint" id="fHint">Search TMDB for films and series. Add a year to narrow it down.</p>
     <div class="res" id="res"></div>
     <div class="ft"><span></span><button class="ghost" id="bManual">Enter manually →</button></div>
   </div>
@@ -202,7 +214,7 @@ button:disabled{opacity:.5}
         <textarea id="eTh" placeholder="What stayed with you?"></textarea>
       </div>
     </div>
-    <div class="ft"><a id="eImdb" href="#" target="_blank" rel="noopener">IMDb ↗</a><button class="ghost del" id="bDel">Delete</button></div>
+    <div class="ft"><a id="eImdb" href="#" target="_blank" rel="noopener">IMDb ↗</a><button class="ghost" id="bSim" style="color:var(--ink)">Similar →</button><button class="ghost del" id="bDel">Delete</button></div>
   </div>
 </section>
 
@@ -211,6 +223,13 @@ button:disabled{opacity:.5}
     <div class="ph"><h2>Categories</h2><button class="btn ink sm" data-closesh="shCat">Done</button></div>
     <div class="chips" id="cTabs"></div>
     <div class="subs" id="cSubs"></div>
+  </div>
+</div>
+
+<div class="sh" id="shSim">
+  <div class="sp" style="height:88dvh">
+    <div class="ph"><h2>Similar</h2><button class="btn ink sm" data-closesh="shSim">Done</button></div>
+    <div class="grid" id="simGrid"></div>
   </div>
 </div>
 
@@ -322,7 +341,7 @@ const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const IMG='https://image.tmdb.org/t/p/';
 const LS='watchlog.items',LC='watchlog.cfg';
-let items=[],cfg={key:'',omdb:'',gh:'',gist:'',lastSync:0,dirty:false,posters:'dot'};
+let items=[],cfg={key:'',omdb:'',gh:'',gist:'',lastSync:0,dirty:false,posters:'dot',hidden:[]};
 const ui={kind:'all',sort:'recent',g:'',s:'',q:''};
 
 /* ---------- storage (this phone only) ---------- */
@@ -344,7 +363,7 @@ async function findGist(){
   for(let page=1;page<=5;page++){const list=await gh('/gists?per_page=100&page='+page);
     const g=list.find(x=>x.description===GDESC&&x.files&&x.files[GFILE]);if(g){cfg.gist=g.id;saveCfg();return gh('/gists/'+g.id)}if(list.length<100)break}
   return null}
-const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters},items:items.map(({dots,...t})=>t)});
+const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[]},items:items.map(({dots,...t})=>t)});
 async function push(){
   if(!cfg.gh||syncing)return;syncing=true;
   try{if(!cfg.lastSync){const arr=await pull().catch(e=>{if(e.code==='none')return null;throw e});if(arr)merge(arr)}
@@ -487,6 +506,7 @@ function close(id){const el=$('#'+id);if(!el.classList.contains('open'))return;e
 window.addEventListener('popstate',()=>{if(popSkip){popSkip--;return}pushed=false;const id=stack[stack.length-1];if(!id)return;
   const keep=()=>{try{history.pushState({w:1},'');pushed=true}catch(e){}};
   if(id==='ovEd'&&!xArm&&edDirty()){armX(true);keep();return}
+  if(id==='ovEd'&&edBack()){keep();return}
   $('#'+id).classList.remove('open');stack.pop();if(id==='ovEd')cur=null;else renderEd();if(stack.length)keep()});
 document.addEventListener('click',e=>{const c=e.target.closest('[data-close]');if(c)close(c.dataset.close);const s=e.target.closest('[data-closesh]');if(s){close(s.dataset.closesh);renderEd()}
   if(e.target.classList.contains('sh')){close(e.target.id);renderEd()}});
@@ -494,11 +514,12 @@ let tt;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('on
 
 /* ---------- add ---------- */
 let lastRes=[];
-function openAdd(){$('#fq').value='';$('#res').innerHTML=cfg.key?'':`<div class="msg">${ERR.nokey}<br><br><button class="btn line sm" id="bKey2">Open Settings</button></div>`;open('ovAdd');if(cfg.key)setTimeout(()=>$('#fq').focus(),330)}
+function openAdd(){$('#fq').value='';mode='fy';if(!cfg.key)$('#res').innerHTML=`<div class="msg">${ERR.nokey}<br><br><button class="btn line sm" id="bKey2">Open Settings</button></div>`;else showForYou();open('ovAdd')}
+$('#fq').addEventListener('input',e=>{if(!e.target.value.trim()&&cfg.key&&mode!=='fy'){mode='fy';showForYou()}});
 $('#bAdd').addEventListener('click',openAdd);
 let busy=false;
 $('#fFind').addEventListener('submit',async e=>{
-  e.preventDefault();let q=$('#fq').value.trim();if(!q||busy)return;busy=true;$('#fq').blur();
+  e.preventDefault();let q=$('#fq').value.trim();if(!q||busy)return;busy=true;mode='search';$('#fq').blur();
   const ym=q.match(/\s((19|20)\d{2})$/),yr=ym?ym[1]:'';if(yr)q=q.slice(0,-5).trim();
   $('#res').innerHTML='<div class="load"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
   try{const d=await tm('/search/multi',{query:q,include_adult:'false',language:'en-US'});
@@ -513,6 +534,12 @@ $('#fFind').addEventListener('submit',async e=>{
   busy=false});
 $('#res').addEventListener('click',async e=>{
   if(e.target.closest('#bKey2')){openSet();return close('ovAdd')}
+  if(mode==='fy'){
+    const fg=e.target.closest('[data-fg]');if(fg){fyG=fyG===fg.dataset.fg?'':fg.dataset.fg;return drawForYou()}
+    const x=e.target.closest('.x');if(x){const k=x.dataset.k;cfg.hidden=[...(cfg.hidden||[]),k].slice(-500);saveCfg();fy.list=fy.list.filter(e=>e.key!==k);drawForYou();return toast('Hidden')}
+    const c=e.target.closest('.rc');if(!c||busy)return;busy=true;c.classList.add('busy');
+    try{await openTmdb(fyShown[+c.dataset.i].c,false);close('ovAdd')}catch(err){toast(ERR[err&&err.code]||ERR.http)}
+    c.classList.remove('busy');busy=false;return}
   const c=e.target.closest('.rc');if(!c||busy)return;const r=lastRes[+c.dataset.i],kind=r.media_type==='tv'?'series':'film';
   const ex=items.find(t=>t.tmdb===r.id&&t.kind===kind);if(ex){openEd(ex,false);return close('ovAdd')}
   busy=true;c.classList.add('busy');
@@ -521,11 +548,79 @@ $('#res').addEventListener('click',async e=>{
   c.classList.remove('busy');busy=false});
 $('#bManual').addEventListener('click',()=>{openEd({id:uid(),title:$('#fq').value.trim(),year:'',kind:'film',runtime:'',seasons:'',creator:'',cast:[],synopsis:'',genres:[],subs:[],rating:0,status:'watched',date:today(),thoughts:''},true);close('ovAdd');if(!cur.title)openDet()});
 
+/* ---------- recommendations ---------- */
+let mode='fy',fy={sig:'',list:null,err:''},fyG='',fyShown=[];
+const recCache=new Map();
+const ckind=c=>c.media_type==='tv'?'series':'film';
+const ctitle=c=>c.title||c.name||'';
+const cyear=c=>String(parseInt(c.release_date||c.first_air_date)||'');
+const inLog=c=>{const k=ckind(c),t=ctitle(c).toLowerCase(),y=cyear(c);return items.find(i=>(i.tmdb===c.id&&i.kind===k)||(!i.tmdb&&String(i.title).toLowerCase()===t&&(!i.year||!y||String(i.year)===y)))};
+const ourG=ids=>{const g=new Set();(ids||[]).forEach(id=>{(TG[id]||[]).forEach(x=>g.add(x));if(id===10765)g.add('scifi')});return[...g]};
+async function recsFor(tmdb,kind){
+  const type=kind==='series'?'tv':'movie',key=type+':'+tmdb;if(recCache.has(key))return recCache.get(key);
+  let d=await tm(`/${type}/${tmdb}/recommendations`,{language:'en-US'}),r=d.results||[];
+  if(r.length<6){const s=await tm(`/${type}/${tmdb}/similar`,{language:'en-US'});const ids=new Set(r.map(x=>x.id));r=r.concat((s.results||[]).filter(x=>!ids.has(x.id)))}
+  r=r.filter(x=>!x.adult).map(x=>({...x,media_type:x.media_type==='tv'||x.media_type==='movie'?x.media_type:type}));recCache.set(key,r);return r}
+async function openTmdb(c,keep){
+  const ex=inLog(c);if(ex){openEd(ex,false,keep);return}
+  const d=await details(c);const[dd]=await Promise.all([makeDots(d.poster),addImdb(d)]);d.dots=dd;
+  openEd({...d,id:uid(),rating:0,status:'want',date:'',thoughts:''},true,keep)}
+async function buildForYou(){
+  const seen=items.filter(t=>t.tmdb&&t.status!=='want');
+  const seeds=seen.map(t=>({t,w:t.rating?Math.max(0,t.rating-5):(t.status==='watching'?2:1.5)})).filter(s=>s.w>0)
+    .sort((a,b)=>b.w-a.w||(b.t.updated||b.t.added||0)-(a.t.updated||a.t.added||0)).slice(0,10);
+  if(!seeds.length)return[];
+  const gw={};items.filter(t=>t.status!=='want').forEach(t=>(t.genres||[]).forEach(g=>gw[g]=(gw[g]||0)+(t.rating?t.rating/10:.5)));
+  const res=await Promise.allSettled(seeds.map(s=>recsFor(s.t.tmdb,s.t.kind)));
+  if(res.every(r=>r.status==='rejected'))throw res[0].reason;
+  const hid=new Set(cfg.hidden||[]),pool=new Map();
+  res.forEach((r,i)=>{if(r.status!=='fulfilled')return;const s=seeds[i];
+    r.value.slice(0,20).forEach((c,rank)=>{const key=c.media_type+':'+c.id;if(hid.has(key)||inLog(c))return;
+      const sc=s.w*(1-rank/40),e=pool.get(key)||{key,c,score:0,why:[],gen:ourG(c.genre_ids)};e.score+=sc;e.why.push([sc,s.t.title]);pool.set(key,e)})});
+  const out=[...pool.values()];
+  out.forEach(e=>{e.score*=1+.12*e.gen.reduce((a,g)=>a+Math.min(3,gw[g]||0),0);e.why.sort((a,b)=>b[0]-a[0]);
+    e.because=e.why[0][1]+(e.why.length>1?` +${e.why.length-1}`:'')});
+  return out.sort((a,b)=>b.score-a.score).slice(0,40)}
+const fySig=()=>items.map(t=>t.id+':'+(t.rating||0)+':'+t.status).sort().join('|');
+async function showForYou(){
+  const sig=fySig();
+  if(fy.list&&fy.sig===sig){fy.list=fy.list.filter(e=>!inLog(e.c));return drawForYou()}
+  $('#res').innerHTML='<div class="fy"><span>For you</span></div><div class="load"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
+  try{fy={sig,list:await buildForYou(),err:''}}catch(e){fy={sig:'',list:null,err:e&&e.code}}
+  if(mode==='fy')drawForYou()}
+function drawForYou(){
+  if(fy.err){$('#res').innerHTML=`<div class="msg">${ERR[fy.err]||ERR.http}</div>`;return}
+  const L=fy.list||[];
+  if(!L.length){$('#res').innerHTML=`<div class="msg">${items.some(t=>t.tmdb&&t.status!=='want')?'No new suggestions right now. Rate a few more titles and check back.':'Suggestions appear here once you\u2019ve added and rated a few titles you found through search.'}</div>`;return}
+  const gc={};L.forEach(e=>e.gen.forEach(g=>gc[g]=(gc[g]||0)+1));
+  const gs=TAX.filter(g=>gc[g.id]>=2).map(g=>g.id);if(fyG&&!gs.includes(fyG))fyG='';
+  fyShown=(fyG?L.filter(e=>e.gen.includes(fyG)):L).slice(0,20);
+  $('#res').innerHTML=`<div class="fy"><span>For you</span><span>${fyShown.length}</span></div>`+
+    (gs.length>1?`<div class="chips">${`<button class="chip ${fyG?'':'on'}" data-fg="">All</button>`+gs.map(g=>`<button class="chip ${fyG===g?'on':''}" data-fg="${g}">${GEN[g].n}</button>`).join('')}</div>`:'')+
+    fyShown.map((e,i)=>{const c=e.c,pv=c.poster_path?`<span class="pm ph"><img src="${IMG}w92${esc(c.poster_path)}" alt="" loading="lazy"></span>`:poster({title:ctitle(c)});
+      return`<div class="rc sug" role="button" tabindex="0" data-i="${i}">${pv}<span><b>${esc(ctitle(c))}</b><small>${esc([cyear(c),kindL(ckind(c)),e.gen.map(g=>GEN[g].n).slice(0,2).join(', ')].filter(Boolean).join(' · '))}</small><span class="why">Because you liked ${esc(e.because)}</span></span><button class="x" data-k="${esc(e.key)}" aria-label="Not interested">×</button></div>`}).join('')}
+
+/* similar sheet */
+let simList=[];
+$('#bSim').addEventListener('click',async()=>{
+  if(!cur||!cur.tmdb)return;const g=$('#simGrid');g.innerHTML='<div class="load" style="grid-column:1/-1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';open('shSim');
+  try{simList=(await recsFor(cur.tmdb,cur.kind)).filter(c=>!(c.id===cur.tmdb&&ckind(c)===cur.kind)).slice(0,18);
+    g.innerHTML=simList.length?simList.map((c,i)=>{const have=inLog(c),pv=have?poster(have):c.poster_path?`<span class="pm ph"><img src="${IMG}w185${esc(c.poster_path)}" alt="" loading="lazy"></span>`:poster({title:ctitle(c)});
+      return`<button class="gi" data-i="${i}">${pv}<b>${esc(ctitle(c))}</b><small>${esc(cyear(c))}${have?` · <em>${have.status==='want'?'Queued':have.rating?have.rating+'/10':'Logged'}</em>`:''}</small></button>`}).join('')
+      :'<div class="msg" style="grid-column:1/-1">TMDB has no similar titles for this one yet.</div>'}
+  catch(e){g.innerHTML=`<div class="msg" style="grid-column:1/-1">${ERR[e&&e.code]||ERR.http}</div>`}});
+let simBusy=false;
+$('#simGrid').addEventListener('click',async e=>{const b=e.target.closest('.gi');if(!b||simBusy)return;simBusy=true;b.style.opacity=.5;
+  const prev={cur,isNew,snap0,th:$('#eTh').value};
+  try{await openTmdb(simList[+b.dataset.i],true);edPrev.push(prev);close('shSim')}catch(err){toast(ERR[err&&err.code]||ERR.http)}
+  b.style.opacity='';simBusy=false});
+
 /* ---------- editor ---------- */
-let cur=null,isNew=false,snap0='',catG='scifi';
-const edDirty=()=>cur&&(isNew?true:JSON.stringify({...cur,thoughts:$('#eTh').value})!==snap0);
-function openEd(t,n){cur=JSON.parse(JSON.stringify(t));cur.cast=cur.cast||[];cur.thoughts=cur.thoughts||'';cur.genres=cur.genres||[];cur.subs=cur.subs||[];isNew=n;
-  snap0=JSON.stringify(cur);$('#eTh').value=cur.thoughts;$('#bDel').hidden=n;armX(false);armDel(false);renderEd();$('.ed').scrollTop=0;open('ovEd');
+let cur=null,isNew=false,snap0='',catG='scifi',edPrev=[];
+function edBack(){if(!edPrev.length)return false;const p=edPrev.pop();cur=p.cur;isNew=p.isNew;snap0=p.snap0;$('#eTh').value=p.th;$('#bDel').hidden=isNew;$('#bSim').hidden=!cur.tmdb;armX(false);armDel(false);renderEd();$('.ed').scrollTop=0;return true}
+const edDirty=()=>cur&&JSON.stringify({...cur,thoughts:$('#eTh').value})!==snap0;
+function openEd(t,n,keep){if(!keep)edPrev=[];cur=JSON.parse(JSON.stringify(t));cur.cast=cur.cast||[];cur.thoughts=cur.thoughts||'';cur.genres=cur.genres||[];cur.subs=cur.subs||[];isNew=n;
+  snap0=JSON.stringify(cur);$('#eTh').value=cur.thoughts;$('#bDel').hidden=n;$('#bSim').hidden=!cur.tmdb;armX(false);armDel(false);renderEd();$('.ed').scrollTop=0;open('ovEd');
   if(!n&&cur.imdb&&!cur.imdbRating&&cfg.omdb){const id=cur.id,imdb=cur.imdb;omdb(imdb).then(o=>{if(!o||!o.rating)return;const x=items.find(i=>i.id===id);if(x){x.imdbRating=o.rating;x.imdbVotes=o.votes;persist()}
     if(cur&&cur.id===id){cur.imdbRating=o.rating;cur.imdbVotes=o.votes;snap0=JSON.stringify({...JSON.parse(snap0),imdbRating:o.rating,imdbVotes:o.votes});renderEd()}})}}
 function renderEd(){
@@ -546,12 +641,12 @@ $('#eHero').addEventListener('click',e=>{if(e.target.id==='eSyn')e.target.classL
 let xArm=false,dArm=false;
 function armX(v){xArm=v;$('#bEdX').textContent=v?'Discard changes?':'Close';$('#bEdX').style.color=v?'var(--red)':''}
 function armDel(v){dArm=v;$('#bDel').textContent=v?'Tap again to delete':'Delete';$('#bDel').classList.toggle('arm',v)}
-$('#bEdX').addEventListener('click',()=>{if(!xArm&&edDirty())return armX(true);close('ovEd');cur=null});
+$('#bEdX').addEventListener('click',()=>{if(!xArm&&edDirty())return armX(true);if(edBack())return;close('ovEd');cur=null});
 $('#bSave').addEventListener('click',()=>{
   if(!cur.title){openDet();return toast('Give it a title first')}
   cur.thoughts=$('#eTh').value;cur.updated=Date.now();if(isNew)cur.added=Date.now();
-  const n=isNew,t=cur;upsert(t);close('ovEd');cur=null;toast(n?'Added to your log':'Saved')});
-$('#bDel').addEventListener('click',()=>{if(!dArm)return armDel(true);removeItem(cur.id);close('ovEd');cur=null;toast('Deleted')});
+  const n=isNew,t=cur;upsert(t);toast(n?'Added to your log':'Saved');if(edBack())return;close('ovEd');cur=null});
+$('#bDel').addEventListener('click',()=>{if(!dArm)return armDel(true);removeItem(cur.id);toast('Deleted');if(edBack())return;close('ovEd');cur=null});
 
 /* ---------- categories ---------- */
 $('#eCats').addEventListener('click',()=>{catG=cur.genres[0]||'scifi';renderCats();open('shCat')});
