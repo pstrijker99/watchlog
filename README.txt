@@ -1,3 +1,5 @@
+WATCHLOG alpha 0.0.1 — install on your phone
+
 WATCHLOG — install on your phone
 
 1. Put this folder online (one time). Use Netlify: sign in at app.netlify.com,

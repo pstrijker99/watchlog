@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Watchlog</title>
+<meta name="version" content="alpha 0.0.1">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -37,7 +38,8 @@ button:disabled{opacity:.5}
 .sbar input{flex:1;height:44px;border:0;border-bottom:1.5px solid var(--ink);background:none;font-size:18px;padding:0 2px;outline:0}
 .bar{display:flex;gap:8px;align-items:center;padding:0 16px 10px}
 .seg{display:flex;background:var(--card);border-radius:22px;padding:3px;flex:1}
-.seg button{flex:1;height:36px;border-radius:18px;font-size:14px;font-weight:500;color:var(--mute)}
+.seg button{flex:1;height:36px;border-radius:18px;font-size:14px;font-weight:500;color:var(--mute);white-space:nowrap;padding:0 2px}
+#kindSeg button{font-size:13px}
 .seg button.on{background:var(--ink);color:var(--bg)}
 .sort{height:42px;padding:0 14px;border-radius:21px;background:var(--card);font:700 14px var(--dot);text-transform:uppercase;white-space:nowrap}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;flex:none}
@@ -152,12 +154,56 @@ button:disabled{opacity:.5}
 .form .r2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .form p{margin:0;font-size:13px;color:var(--mute)}
 .form p a{color:var(--ink)}
+.form p.ver{font:700 12px var(--dot);text-transform:uppercase;letter-spacing:.04em;color:var(--mute);opacity:.7;text-align:center;margin-top:8px}
 .form .row2{display:flex;gap:8px;align-items:center}
 .form .row2 .btn{flex:1}
 .ok{color:var(--ink)}.bad{color:var(--red)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:20px;font-size:14px;font-weight:500;opacity:0;transition:.25s;z-index:40;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 [hidden]{display:none!important}
+/* lists + sharing */
+.row{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.selecting .row[data-id] .pm{outline:2px solid var(--dim);outline-offset:2px}
+.row.pick .pm{outline:3px solid var(--red)!important}
+.row.pick{background:var(--card)}
+.selbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:8;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border-radius:30px;padding:6px 6px 6px 18px;box-shadow:0 10px 30px rgb(0 0 0/.35);width:max-content;max-width:calc(100vw - 24px)}
+.selbar span{font:700 14px var(--dot);white-space:nowrap;text-transform:uppercase}
+.selbar .btn{height:40px;padding:0 16px}
+.selbar .btn.line{color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent)}
+.selbar .ib{color:var(--bg)}
+:root:not([data-layout=phone]) .selbar{left:calc((100vw - var(--pw))/2 + var(--sw,0px)/2)}
+:root[data-layout=desk] .selbar{--sw:260px}
+.lnew{display:flex;gap:8px;padding:4px 0 12px}
+.lnew input,.lname{flex:1;height:44px;border:0;border-bottom:1.5px solid var(--dim);background:none;font-size:17px;outline:0;padding:0 2px;color:var(--ink)}
+.lnew input:focus{border-color:var(--ink)}
+.lc,.pl{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:10px 0;border-bottom:1px solid var(--line)}
+.lp{display:flex;flex:none}
+.lp .pm{width:34px;margin-right:-14px;box-shadow:2px 0 0 var(--bg)}
+.lp .pm:last-child{margin-right:0}
+.lp.sm .pm{width:26px;margin-right:-11px}
+.lt{flex:1;display:flex;flex-direction:column;gap:2px}
+.lt b{font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt small{font-size:13px;color:var(--mute)}
+.chev{font-size:24px;color:var(--mute)}
+.plc{font:700 15px var(--dot);color:var(--mute);min-width:44px;text-align:right}
+.pl.on .plc{color:var(--red);font-size:22px}
+.lh{display:flex;justify-content:space-between;align-items:center;min-height:52px}
+.lha{display:flex;gap:6px;align-items:center}
+h2.lname{font:700 26px/1.15 var(--sans);margin:4px 0 0;border:0;height:auto}
+input.lname{font:700 24px var(--sans);width:100%}
+.lsub{font:700 13px var(--dot);color:var(--mute);text-transform:uppercase;margin:6px 0 8px}
+.lact{display:flex;gap:2px}.lact .ib{width:38px;height:38px;font-size:18px;color:var(--mute)}
+.eact{display:flex;align-items:center;gap:2px}
+.eact .ib svg{width:21px;height:21px}
+#shPrev{display:block;width:100%;max-width:340px;margin:0 auto 12px;border-radius:14px;aspect-ratio:4/5;background:#111;object-fit:contain;transition:opacity .2s}
+#shPrev.busy{opacity:.4}
+.shrow{display:flex;gap:8px;flex-wrap:wrap}.shrow .btn{flex:1}
+.chk{display:flex;align-items:center;gap:10px;font-size:15px;margin:0 0 12px;min-height:40px}
+.chk input{width:20px;height:20px;accent-color:var(--red)}
+#impList{overflow-y:auto;margin:0 -2px 12px}
+#actBtns{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+:root[data-layout=desk] .lp .pm{width:30px}
+
 
 /* ===== tablet / landscape / desktop layouts (phone layout above stays untouched) ===== */
 #side{display:contents}
@@ -201,6 +247,7 @@ button:disabled{opacity:.5}
 :root[data-layout=desk] .sbar input{height:38px;font-size:15px;border:1px solid var(--dim);border-radius:10px;padding:0 12px}
 :root[data-layout=desk] .bar{flex-direction:column;align-items:stretch;gap:8px}
 :root[data-layout=desk] .seg button{height:32px;font-size:13px}
+:root[data-layout=desk] #kindSeg button{font-size:12px}
 :root[data-layout=desk] .sort{height:34px;align-self:flex-start;font-size:13px}
 :root[data-layout=desk] #side .chips{flex-direction:column;overflow:visible;gap:2px;padding:4px 8px 10px}
 :root[data-layout=desk] #side .chip{height:34px;border:0;border-radius:8px;justify-content:space-between;padding:0 10px;font-size:14px}
@@ -245,7 +292,7 @@ button:disabled{opacity:.5}
     <button class="ib" id="bSearchX" aria-label="Close search"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </header>
   <div class="bar">
-    <div class="seg" id="kindSeg"><button data-k="all" class="on">All</button><button data-k="film">Film</button><button data-k="series">Series</button><button data-k="queue">Queue</button></div>
+    <div class="seg" id="kindSeg"><button data-k="all" class="on">All</button><button data-k="film">Film</button><button data-k="series">Series</button><button data-k="queue">Queue</button><button data-k="lists">Lists</button></div>
     <button class="sort" id="bSort">Recent</button>
   </div>
   <div class="chips" id="gChips"></div>
@@ -270,7 +317,7 @@ button:disabled{opacity:.5}
 <section class="ov" id="ovEd" aria-label="Edit title">
   <div class="pane">
     <div class="edEmpty"><span class="pm"><svg viewBox="0 0 10 15" aria-hidden="true" id="edGlyph"></svg></span><div>Select a title to see it here.</div><div id="edHint" style="font-size:14px"></div></div>
-    <div class="ph"><button class="ghost" id="bEdX">Close</button><button class="btn ink sm" id="bSave">Save</button></div>
+    <div class="ph"><button class="ghost" id="bEdX">Close</button><span class="eact"><button class="ib" id="bShare" aria-label="Share" title="Share"><svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v8h14v-8"/></svg></button><button class="ib" id="bToList" aria-label="Add to a list" title="Add to a list (L)"><svg viewBox="0 0 24 24"><path d="M4 6h11M4 12h11M4 18h7M18 14v8M14 18h8"/></svg></button><button class="btn ink sm" id="bSave">Save</button></span></div>
     <div class="ed">
       <div class="hero" id="eHero"></div>
       <div>
@@ -324,6 +371,8 @@ button:disabled{opacity:.5}
       <span class="kbd">Ctrl S</span><span>Save</span>
       <span class="kbd">Del</span><span>Delete (press twice)</span>
       <span class="kbd">Esc</span><span>Close / leave a field</span>
+      <span class="kbd">Ctrl-click</span><span>Select several titles (Shift-click for a range)</span>
+      <span class="kbd">L</span><span>Add the open title to a list</span>
       <span class="kbd">?</span><span>This list</span>
     </div>
   </div>
@@ -363,7 +412,47 @@ button:disabled{opacity:.5}
       <input type="file" id="fImp" accept="application/json,.json" hidden>
       <p id="sCount"></p>
       <p>This product uses the TMDB API but is not endorsed or certified by TMDB. Film data and posters © TMDB.</p>
+      <p class="ver" id="sVer"></p>
     </div>
+  </div>
+</div>
+
+<div class="selbar" id="selBar" hidden><span id="selN"></span><button class="btn sm" id="selList">Add to list</button><button class="btn line sm" id="selShare">Share</button><button class="ib" id="selX" aria-label="Stop selecting"><svg viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:2;fill:none;width:20px;height:20px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+
+<div class="sh" id="shList">
+  <div class="sp">
+    <div class="ph"><h2>Lists</h2><button class="btn ink sm" data-closesh="shList">Done</button></div>
+    <p class="hint" id="plHead" style="margin-top:-6px"></p>
+    <form class="lnew" id="plForm"><input id="plName" placeholder="New list name" maxlength="80" autocomplete="off" enterkeyhint="done"><button class="btn sm">Create</button></form>
+    <div id="plLists" style="overflow-y:auto"></div>
+  </div>
+</div>
+
+<div class="sh" id="shShare">
+  <div class="sp">
+    <div class="ph"><h2>Share</h2><button class="btn ink sm" data-closesh="shShare">Done</button></div>
+    <div style="overflow-y:auto">
+      <img id="shPrev" alt="Share card preview">
+      <label class="chk" id="shThRow"><input type="checkbox" id="shTh"> Include my thoughts</label>
+      <div class="shrow"><button class="btn" id="shImgBtn">Share image</button><button class="btn line" id="shTxtBtn">Share text</button></div>
+      <div style="text-align:center;margin-top:6px"><button class="ghost" id="shCopy">Copy text</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="sh" id="shAct">
+  <div class="sp">
+    <div class="ph"><h2 id="actHead" style="font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></h2><button class="btn ink sm" data-closesh="shAct">Cancel</button></div>
+    <div id="actBtns"></div>
+  </div>
+</div>
+
+<div class="sh" id="shImp">
+  <div class="sp">
+    <div class="ph"><h2 id="impHead" style="font-size:20px;text-transform:none;font-family:var(--sans)"></h2><button class="btn ink sm" data-closesh="shImp">Close</button></div>
+    <p class="hint" id="impSub" style="margin-top:-6px"></p>
+    <div id="impList"></div>
+    <div class="shrow"><button class="btn" id="impSave">Save as list</button><button class="btn line" id="impQ">Add to my Queue</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -560,6 +649,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const VERSION='alpha 0.0.1';
 const IMG='https://image.tmdb.org/t/p/';
 /* built-in keys (scrambled only to keep them off screen; not secret) */
 const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
@@ -590,7 +680,7 @@ async function findGist(){
   for(let page=1;page<=5;page++){const list=await gh('/gists?per_page=100&page='+page);
     const g=list.find(x=>x.description===GDESC&&x.files&&x.files[GFILE]);if(g){cfg.gist=g.id;saveCfg();return gh('/gists/'+g.id)}if(list.length<100)break}
   return null}
-const packed=()=>JSON.stringify({app:'watchlog',version:1,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[]},items});
+const packed=()=>JSON.stringify({app:'watchlog',version:2,app_version:VERSION,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[]},items,lists});
 async function push(){
   if(!cfg.gh||syncing)return;syncing=true;
   try{if(!cfg.lastSync){const arr=await pull().catch(e=>{if(e.code==='none')return null;throw e});if(arr)merge(arr)}
@@ -604,8 +694,10 @@ async function pull(){
   const g=await findGist();if(!g)throw{code:'none'};
   const f=g.files[GFILE];let txt=f.content;
   if(f.truncated&&f.raw_url){try{txt=await (await fetch(f.raw_url)).text()}catch(e){throw{code:'offline'}}}
-  const d=JSON.parse(txt);return Array.isArray(d.items)?d.items:[]}
-function merge(arr){let n=0;const byId=new Map(items.map(t=>[String(t.id),t]));
+  const d=JSON.parse(txt);return{items:Array.isArray(d.items)?d.items:[],lists:Array.isArray(d.lists)?d.lists:[]}}
+function mergeLists(arr){let n=0;const m=new Map(lists.map(L=>[L.id,L]));(arr||[]).forEach(L=>{if(!L||!L.id||!Array.isArray(L.items))return;const mine=m.get(L.id);if(!mine||(L.updated||0)>(mine.updated||0)){m.set(L.id,L);n++}});
+  lists=[...m.values()].sort((a,b)=>(b.updated||0)-(a.updated||0));try{localStorage.setItem(LL,JSON.stringify(lists))}catch(e){}return n}
+function merge(d){if(Array.isArray(d))d={items:d,lists:[]};const nl=mergeLists(d.lists);const arr=d.items;let n=nl;const byId=new Map(items.map(t=>[String(t.id),t]));
   arr.forEach(t=>{if(!t||!t.id||!t.title)return;const id=String(t.id),mine=byId.get(id);
     if(!mine||(t.updated||0)>(mine.updated||0)){byId.set(id,{...t,id});n++}});
   items=[...byId.values()];persist();render();return n}
@@ -682,10 +774,12 @@ const ERR={nokey:'Add your free TMDB key in Settings first.',auth:'TMDB didn’t
 
 /* ---------- home ---------- */
 function note(s){$('#note').textContent=s}
-function base(){let a=items;if(ui.kind==='queue')return a.filter(t=>t.status==='want');a=a.filter(t=>t.status!=='want');return ui.kind==='all'?a:a.filter(t=>t.kind===ui.kind)}
+function base(){let a=items;if(ui.kind==='lists')return[];if(ui.kind==='queue')return a.filter(t=>t.status==='want');a=a.filter(t=>t.status!=='want');return ui.kind==='all'?a:a.filter(t=>t.kind===ui.kind)}
 let listOrder=[];
 const fmtDate=d=>{if(!d)return'';const x=new Date(d+'T12:00');return isNaN(x)?'':x.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'2-digit'})};
 function render(){
+  $('#bSort').hidden=false;
+  if(ui.kind==='lists'){$('#gChips').innerHTML='';$('#sChips').innerHTML='';listOrder=[];renderLists();return}
   const b=base();
   const gs=TAX.filter(g=>b.some(t=>(t.genres||[]).includes(g.id)));
   if(ui.g&&!gs.some(g=>g.id===ui.g)){ui.g='';ui.s=''}
@@ -703,9 +797,9 @@ function render(){
   a=a.slice().sort(by[ui.sort]);listOrder=a;
   if(!items.length){$('#list').innerHTML=`<div class="empty">${poster({title:'W'})}<div>Nothing logged yet.</div><button class="btn" id="bFirst">Add your first title</button>${tmdbKey()?'':'<button class="ghost" id="bKey">Set up TMDB lookups</button>'}</div>`;return}
   if(!a.length){$('#list').innerHTML=`<div class="empty">${ui.kind==='queue'&&!ui.q?'Your queue is empty. Add a title and mark it “Want”.':'Nothing matches.'}</div>`;return}
-  $('#list').innerHTML=a.map(t=>`<button class="row${cur&&cur.id===t.id?' sel':''}" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="xc">${t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''}</span><span class="xc">${t.status==='want'?'Queued':esc(fmtDate(t.date))}</span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
+  $('#list').innerHTML=a.map(t=>`<button class="row${cur&&cur.id===t.id?' sel':''}${sel.has(t.id)?' pick':''}" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="xc">${t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''}</span><span class="xc">${t.status==='want'?'Queued':esc(fmtDate(t.date))}</span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
 
-$('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;ui.kind=k;ui.g='';ui.s='';
+$('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;if(k==='lists'&&ui.kind==='lists'){ui.list=null;ui.listEdit=false}ui.kind=k;ui.g='';ui.s='';if(k==='lists')endSelect();
   document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();$('#list').scrollTop=0});
 const SORTS=['recent','rating','az'],SL={recent:'Recent',rating:'Rating',az:'A–Z'};
 $('#bSort').addEventListener('click',()=>{ui.sort=SORTS[(SORTS.indexOf(ui.sort)+1)%3];$('#bSort').textContent=SL[ui.sort];render()});
@@ -715,7 +809,13 @@ $('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hi
 $('#bSearchX').addEventListener('click',()=>{ui.q='';$('#q').value='';$('#topB').hidden=true;$('#topA').hidden=false;render()});
 $('#q').addEventListener('input',e=>{ui.q=e.target.value.trim();render()});
 $('#list').addEventListener('click',e=>{if(e.target.closest('#bFirst'))return openAdd();if(e.target.closest('#bKey'))return openSet();
-  const r=e.target.closest('.row');if(r){const t=items.find(x=>x.id===r.dataset.id);if(t)selectItem(t)}});
+  if(ui.kind==='lists'){listClick(e);return}
+  const r=e.target.closest('.row[data-id]');if(!r)return;const id=r.dataset.id;
+  if(e.shiftKey&&layout==='desk'){e.preventDefault();if(!selMode)startSelect(cur&&cur.id!==id?cur.id:null);const ids=listOrder.map(t=>t.id),a=ids.indexOf(selAnchor||id),b=ids.indexOf(id);
+    if(a>=0&&b>=0)ids.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>sel.add(x));else sel.add(id);updSel();return}
+  if(e.ctrlKey||e.metaKey){if(!selMode)startSelect(id);else togglePick(id);return}
+  if(selMode){togglePick(id);return}
+  const t=items.find(x=>x.id===id);if(t)selectItem(t)});
 
 /* ---------- overlays + back button ---------- */
 const stack=[];let popSkip=0,pushed=false;
@@ -902,7 +1002,7 @@ $('#bDetOk').addEventListener('click',()=>{
   close('shDet');renderEd()});
 
 /* ---------- settings ---------- */
-function openSet(){$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$('#sOmdbMsg').textContent='';$('#sKeyMsg').textContent='';$('#sKeyMsg').className='';
+function openSet(){$('#sVer').textContent='Watchlog \u00b7 '+VERSION;$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$('#sOmdbMsg').textContent='';$('#sKeyMsg').textContent='';$('#sKeyMsg').className='';
   document.querySelectorAll('#sPost button').forEach(b=>b.classList.toggle('on',b.dataset.p===cfg.posters));
   $('#sGh').value=cfg.gh||'';syncMsg();$('#sCount').textContent=`${items.length} title${items.length===1?'':'s'} stored on this phone. Export saves a file to Downloads; Import reads one back.`;open('shSet')}
 $('#bSet').addEventListener('click',openSet);
@@ -919,20 +1019,236 @@ $('#bSync').addEventListener('click',async()=>{if(!cfg.gh)return toast('Paste a 
   try{await push();toast('Backed up to GitHub')}catch(e){}});
 let restArm=false;
 $('#bRest').addEventListener('click',async()=>{if(!cfg.gh)return toast('Paste a GitHub token first');const m=$('#sSync');m.className='';m.textContent='Looking for your backup…';
-  try{const arr=await pull();const n=merge(arr);m.textContent=`Restored ${arr.length} titles (${n} new or newer).`;toast('Restored from GitHub');if(n)changed()}
+  try{const d=await pull();const n=merge(d);m.textContent=`Restored ${d.items.length} titles and ${d.lists.length} list${d.lists.length===1?'':'s'} (${n} new or newer).`;toast('Restored from GitHub');if(n)changed()}
   catch(e){m.className='bad';m.textContent=e.code==='none'?'No Watchlog backup found on this GitHub account yet.':e.code==='auth'?'GitHub didn\u2019t accept the token.':e.code==='offline'?'No connection.':'Restore failed. Try again.'}});
 $('#bExp').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify({app:'watchlog',version:1,exported:new Date().toISOString(),items},null,1)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({app:'watchlog',version:2,app_version:VERSION,exported:new Date().toISOString(),items,lists},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`watchlog-${today()}.json`;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('Backup saved to Downloads')});
 $('#bImp').addEventListener('click',()=>$('#fImp').click());
 $('#fImp').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
   try{const d=JSON.parse(await f.text()),arr=Array.isArray(d)?d:d.items;if(!Array.isArray(arr))throw 0;
     const ok=arr.filter(t=>t&&typeof t==='object'&&t.id&&t.title);const ids=new Set(ok.map(t=>String(t.id)));
-    items=items.filter(t=>!ids.has(String(t.id))).concat(ok.map(t=>({...t,id:String(t.id)})));persist();render();openSet();toast(`Imported ${ok.length} titles`);changed()}
+    items=items.filter(t=>!ids.has(String(t.id))).concat(ok.map(t=>({...t,id:String(t.id)})));persist();if(Array.isArray(d.lists))mergeLists(d.lists);render();openSet();toast(`Imported ${ok.length} titles`);changed()}
   catch(err){toast('That file isn’t a Watchlog backup')}});
 
 /* ---------- start ---------- */
+/* ---------- lists ---------- */
+let lists=[];const LL='watchlog.lists';
+const sel=new Set();let selMode=false,selAnchor=null;
+function loadLists(){try{lists=JSON.parse(localStorage.getItem(LL)||'[]')}catch(e){lists=[]}if(!Array.isArray(lists))lists=[]}
+function saveLists(){try{localStorage.setItem(LL,JSON.stringify(lists))}catch(e){toast('Phone storage is full')}changed()}
+const refOf=t=>({key:t.tmdb?t.kind+':'+t.tmdb:'log:'+t.id,tmdb:t.tmdb||0,kind:t.kind||'film',title:t.title||'',year:t.year||'',poster:t.poster||'',logId:t.id||''});
+const refOfC=c=>({key:ckind(c)+':'+c.id,tmdb:c.id,kind:ckind(c),title:ctitle(c),year:cyear(c),poster:c.poster_path||'',logId:''});
+const resolve=e=>items.find(i=>(e.tmdb&&i.tmdb===e.tmdb&&i.kind===e.kind)||(e.logId&&i.id===e.logId));
+function newList(name,entries){const L={id:uid(),name:name.trim().slice(0,80)||'Untitled list',items:[],created:Date.now(),updated:Date.now()};(entries||[]).forEach(e=>addToList(L,e,true));lists.unshift(L);saveLists();return L}
+function addToList(L,e,quiet){if(L.items.some(x=>x.key===e.key))return false;L.items.push({...e});L.updated=Date.now();if(!quiet)saveLists();return true}
+function listPosters(L){return L.items.slice(0,4).map(e=>{const r=resolve(e)||e;return poster({title:r.title,poster:r.poster},'w92')}).join('')}
+function renderLists(){
+  const box=$('#list');$('#bSort').hidden=true;
+  if(ui.list){const L=lists.find(x=>x.id===ui.list);if(!L){ui.list=null}else return renderListDetail(L,box)}
+  box.innerHTML=`<div class="lnew"><input id="nlName" placeholder="New list name" maxlength="80" autocomplete="off" enterkeyhint="done"><button class="btn sm" id="nlGo">Create</button></div>`+
+    (lists.length?lists.map(L=>`<button class="lc" data-list="${esc(L.id)}"><span class="lp">${listPosters(L)||poster({title:L.name})}</span><span class="lt"><b>${esc(L.name)}</b><small>${L.items.length} title${L.items.length===1?'':'s'} · ${esc(fmtDate(new Date(L.updated).toISOString().slice(0,10)))}</small></span><span class="chev">›</span></button>`).join('')
+    :`<div class="empty" style="height:auto;padding-top:40px">No lists yet. Create one above, or long-press titles in your log${layout==='desk'?' (or Ctrl-click them)':''} to select several and add them to a list.</div>`)}
+function renderListDetail(L,box){
+  const ed=ui.listEdit;
+  box.innerHTML=`<div class="lh"><button class="ghost" data-act="back">‹ Lists</button><span class="lha">${ed?`<button class="ghost del" data-act="dellist">${ui.delArm?'Tap again to delete':'Delete list'}</button><button class="btn ink sm" data-act="done">Done</button>`:`<button class="ghost" data-act="edit">Edit</button><button class="btn sm" data-act="sharelist">Share</button>`}</span></div>`+
+    (ed?`<input class="lname" id="lnInput" value="${esc(L.name)}" maxlength="80">`:`<h2 class="lname">${esc(L.name)}</h2>`)+
+    `<p class="lsub">${L.items.length} title${L.items.length===1?'':'s'}${ed?' · use the arrows to reorder':''}</p>`+
+    (L.items.length?L.items.map((e,i)=>{const r=resolve(e),t=r||e;
+      const right=ed?`<span class="lact"><button class="ib" data-act="up" data-i="${i}" aria-label="Move up">↑</button><button class="ib" data-act="down" data-i="${i}" aria-label="Move down">↓</button><button class="ib" data-act="rm" data-i="${i}" aria-label="Remove">×</button></span>`
+        :`<span class="sc ${r&&r.rating?'':'no'}">${r&&r.rating?r.rating:'·'}</span>`;
+      return`<div class="row lrow" role="button" tabindex="0" data-entry="${i}">${poster({title:t.title,poster:t.poster,status:r&&r.status})}<span class="rt"><b>${esc(t.title)}</b><small>${esc([t.year,kindL(t.kind)].filter(Boolean).join(' · '))}${r?(r.status==='want'?' · <em>Queued</em>':''):' · Not in your log'}</small></span>${right}</div>`}).join('')
+    :`<div class="empty" style="height:auto;padding-top:30px">This list is empty. Add titles from a title's <b>+ list</b> button, or select several in your log.</div>`)}
+let entryBusy=false;
+async function openEntry(e){
+  const r=resolve(e);if(r)return selectItem(r);
+  if(!e.tmdb)return toast('This title isn’t in your log');
+  if(entryBusy)return;entryBusy=true;
+  try{await openTmdb({id:e.tmdb,media_type:e.kind==='series'?'tv':'movie',title:e.title,release_date:e.year?e.year+'-01-01':''},false)}catch(err){toast(ERR[err&&err.code]||ERR.http)}
+  entryBusy=false}
+
+/* add-to-list sheet */
+let pending=[];
+function openPicker(refs){pending=refs;drawPicker();open('shList');setTimeout(()=>{if(layout!=='phone')$('#plName').focus()},80)}
+function drawPicker(){
+  const one=pending.length===1;
+  $('#plHead').textContent=one?`Add “${pending[0].title}” to a list`:`Add ${pending.length} titles to a list`;
+  $('#plLists').innerHTML=lists.length?lists.map(L=>{const has=one&&L.items.some(x=>x.key===pending[0].key);
+    return`<button class="pl${has?' on':''}" data-pl="${esc(L.id)}"><span class="lp sm">${listPosters(L)||poster({title:L.name})}</span><span class="lt"><b>${esc(L.name)}</b><small>${L.items.length} title${L.items.length===1?'':'s'}</small></span><span class="plc">${one?(has?'✓':'+'):'Add'}</span></button>`}).join('')
+    :'<p class="msg" style="padding:16px 0">No lists yet — name your first one above.</p>'}
+function pickerAdd(L){
+  if(pending.length===1){const e=pending[0],i=L.items.findIndex(x=>x.key===e.key);
+    if(i>=0){L.items.splice(i,1);L.updated=Date.now();saveLists();toast(`Removed from ${L.name}`)}else{addToList(L,e);toast(`Added to ${L.name}`)}
+    drawPicker();if(ui.kind==='lists')render();return}
+  let n=0;pending.forEach(e=>{if(addToList(L,e,true))n++});saveLists();
+  toast(n?`Added ${n} to ${L.name}`:`Already in ${L.name}`);close('shList');endSelect();if(ui.kind==='lists')render()}
+$('#plForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#plName').value.trim();if(!v)return $('#plName').focus();
+  $('#plName').value='';const L=newList(v);pickerAdd(L)});
+$('#plLists').addEventListener('click',e=>{const b=e.target.closest('[data-pl]');if(!b)return;const L=lists.find(x=>x.id===b.dataset.pl);if(L)pickerAdd(L)});
+
+/* select mode */
+function updSel(){
+  $('#selBar').hidden=!selMode;$('#selN').textContent=sel.size?`${sel.size} selected`:'Tap titles to select';
+  $('#selList').disabled=$('#selShare').disabled=!sel.size;
+  document.documentElement.classList.toggle('selecting',selMode);
+  document.querySelectorAll('#list .row[data-id]').forEach(r=>r.classList.toggle('pick',sel.has(r.dataset.id)))}
+function startSelect(id){selMode=true;if(id){sel.add(id);selAnchor=id}updSel()}
+function endSelect(){selMode=false;sel.clear();selAnchor=null;updSel()}
+function togglePick(id){sel.has(id)?sel.delete(id):sel.add(id);selAnchor=id;if(!sel.size&&layout==='phone'){endSelect();return}updSel()}
+$('#selX').addEventListener('click',endSelect);
+$('#selList').addEventListener('click',()=>{const r=items.filter(t=>sel.has(t.id)).map(refOf);if(r.length)openPicker(r)});
+$('#selShare').addEventListener('click',()=>{const t=listOrder.filter(x=>sel.has(x.id));if(t.length)shareText(manyText(t,'My picks'),'My picks')});
+$('#list').addEventListener('contextmenu',e=>{if(ui.kind==='lists')return;const r=e.target.closest('.row[data-id]');if(!r)return;e.preventDefault();
+  if(!selMode)startSelect(r.dataset.id);else togglePick(r.dataset.id)});
+
+/* list view clicks */
+function listClick(e){
+  const nl=e.target.closest('#nlGo');if(nl){const v=$('#nlName').value.trim();if(!v){$('#nlName').focus();return true}newList(v);render();toast('List created');return true}
+  const lc=e.target.closest('[data-list]');if(lc){ui.list=lc.dataset.list;ui.listEdit=false;ui.delArm=false;render();$('#list').scrollTop=0;return true}
+  const L=lists.find(x=>x.id===ui.list);const a=e.target.closest('[data-act]');
+  if(a&&L){const act=a.dataset.act,i=+a.dataset.i;
+    if(act==='back'){ui.list=null;ui.listEdit=false;render()}
+    else if(act==='edit'){ui.listEdit=true;ui.delArm=false;render()}
+    else if(act==='done'){const v=($('#lnInput')?.value||'').trim();if(v&&v!==L.name){L.name=v.slice(0,80);L.updated=Date.now()}ui.listEdit=false;saveLists();render()}
+    else if(act==='dellist'){if(!ui.delArm){ui.delArm=true;render();return true}lists=lists.filter(x=>x!==L);saveLists();ui.list=null;ui.listEdit=false;ui.delArm=false;render();toast('List deleted')}
+    else if(act==='sharelist')shareListSheet(L);
+    else if(act==='up'&&i>0){[L.items[i-1],L.items[i]]=[L.items[i],L.items[i-1]];L.updated=Date.now();saveLists();render()}
+    else if(act==='down'&&i<L.items.length-1){[L.items[i+1],L.items[i]]=[L.items[i],L.items[i+1]];L.updated=Date.now();saveLists();render()}
+    else if(act==='rm'){L.items.splice(i,1);L.updated=Date.now();saveLists();render()}
+    return true}
+  const en=e.target.closest('[data-entry]');if(en&&L&&!ui.listEdit){openEntry(L.items[+en.dataset.entry]);return true}
+  return ui.kind==='lists'}
+$('#list').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('#nlName'))$('#nlGo').click()});
+
+/* ---------- sharing ---------- */
+const linkFor=t=>t.imdb?`https://www.imdb.com/title/${t.imdb}/`:t.tmdb?`https://www.themoviedb.org/${t.kind==='series'?'tv':'movie'}/${t.tmdb}`:'';
+function catsOf(t){const g=(t.genres||[]).filter(x=>GEN[x]).slice(0,2).map(x=>GEN[x].n),s=(t.subs||[]).filter(x=>SUB[x]).slice(0,2).map(x=>SUB[x].l);return[...g,...s].join(' · ')}
+function titleText(t,withTh){
+  const head=`${t.title}${t.year?` (${t.year})`:''}`+(t.status==='want'?' — on my watchlist':t.rating?` — ${t.rating}/10`:t.status==='watching'?' — watching now':'');
+  const L=[head];const c=catsOf(t);if(c)L.push(c);
+  if(withTh&&t.thoughts&&t.thoughts.trim())L.push('“'+t.thoughts.trim().slice(0,400)+'”');
+  const l=linkFor(t);if(l)L.push(l);return L.join('\n')}
+function manyText(ts,name){return(name?name+'\n\n':'')+ts.map((t,i)=>`${i+1}. ${t.title}${t.year?` (${t.year})`:''}${t.rating?` — ${t.rating}/10`:''}`).join('\n')+'\n\nShared from Watchlog'}
+async function shareText(text,title){
+  if(navigator.share){try{await navigator.share({title,text});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text);toast('Copied — paste it anywhere')}catch(e){toast('Sharing isn’t available here')}}
+async function shareFile(file,text){
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],text});return true}catch(e){return e&&e.name==='AbortError'}}
+  return false}
+function saveBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+
+/* picture card */
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const im=new Image();im.crossOrigin='anonymous';im.onload=()=>r(im);im.onerror=()=>r(null);im.src=src})}
+function wrap(ctx,text,maxW,maxLines){const words=String(text).split(/\s+/),lines=[];let line='';
+  for(const w of words){const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w;if(lines.length===maxLines)break}else line=t}
+  if(lines.length<maxLines&&line)lines.push(line);
+  if(lines.length===maxLines&&words.join(' ').length>lines.join(' ').length){let l=lines[maxLines-1];while(l&&ctx.measureText(l+'…').width>maxW)l=l.slice(0,-1);lines[maxLines-1]=l+'…'}
+  return lines}
+async function makeCard(t,withTh){
+  try{await Promise.all([document.fonts.load('900 60px Doto'),document.fonts.load('700 60px "Space Grotesk"'),document.fonts.load('400 30px "Space Grotesk"')])}catch(e){}
+  const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle='#000';x.fillRect(0,0,W,H);
+  x.fillStyle='#161616';for(let gy=30;gy<H;gy+=30)for(let gx=30;gx<W;gx+=30){x.beginPath();x.arc(gx,gy,2.2,0,7);x.fill()}
+  const PX=80,PY=90,PW=420,PH=630;
+  let im=t.poster?await loadImg(imgSrc(t.poster,'w500')):null,drew=false;
+  x.save();x.beginPath();x.roundRect?x.roundRect(PX,PY,PW,PH,24):x.rect(PX,PY,PW,PH);x.clip();
+  if(im){try{if(cfg.posters==='bw')x.filter='grayscale(1) contrast(1.08)';x.drawImage(im,PX,PY,PW,PH);x.filter='none';x.getImageData(PX,PY,1,1);drew=true}catch(e){drew=false}}
+  if(!drew){x.fillStyle='#111';x.fillRect(PX,PY,PW,PH);x.fillStyle='#f4f4f4';x.font='900 300px Doto, monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(letter(t.title),PX+PW/2,PY+PH/2)}
+  x.restore();
+  if(!drew&&im){/* tainted canvas: start over without the poster */return makeCard({...t,poster:''},withTh)}
+  const TX=550,TW=W-TX-80;x.textAlign='left';x.textBaseline='alphabetic';
+  x.fillStyle='#f4f4f4';x.font='700 62px "Space Grotesk", sans-serif';
+  const tl=wrap(x,t.title,TW,4);tl.forEach((l,i)=>x.fillText(l,TX,PY+60+i*70));
+  let y=PY+60+tl.length*70+20;
+  x.fillStyle='#8c8c8c';x.font='900 34px Doto, monospace';
+  const meta=[t.year,kindL(t.kind).toUpperCase(),t.kind==='series'?(t.seasons?t.seasons+' SEASONS':''):(t.runtime?t.runtime+' MIN':'')].filter(Boolean).join(' · ');
+  x.fillText(meta,TX,y);y+=56;
+  x.font='400 30px "Space Grotesk", sans-serif';x.fillStyle='#b5b5b5';
+  wrap(x,catsOf(t),TW,2).forEach(l=>{x.fillText(l,TX,y);y+=42});
+  if(t.creator){y+=8;x.fillStyle='#8c8c8c';wrap(x,t.creator,TW,2).forEach(l=>{x.fillText(l,TX,y);y+=40})}
+  if(t.imdbRating){y+=16;x.fillStyle='#8c8c8c';x.font='900 30px Doto, monospace';x.fillText('IMDB '+t.imdbRating.toFixed(1),TX,y)}
+  /* rating row */
+  const RY=PY+PH+110;
+  if(t.status==='want'){x.fillStyle='#f4f4f4';x.font='900 64px Doto, monospace';x.fillText('ON MY WATCHLIST',PX,RY+20)}
+  else{for(let i=0;i<10;i++){x.beginPath();x.arc(PX+34+i*72,RY,26,0,7);x.fillStyle=i<(t.rating||0)?((t.rating>=9&&i===t.rating-1)?'#d71921':'#f4f4f4'):'#2a2a2a';x.fill()}
+    x.textAlign='right';x.fillStyle='#f4f4f4';x.font='900 110px Doto, monospace';x.fillText(t.rating?String(t.rating):'–',W-150,RY+38);
+    x.font='900 40px Doto, monospace';x.fillStyle='#8c8c8c';x.fillText('/10',W-80,RY+38);x.textAlign='left'}
+  let ty=RY+110;
+  if(withTh&&t.thoughts&&t.thoughts.trim()){x.fillStyle='#e0e0e0';x.font='400 36px "Space Grotesk", sans-serif';
+    wrap(x,'“'+t.thoughts.trim()+'”',W-160,(H-150-ty)/50|0).forEach(l=>{x.fillText(l,PX,ty);ty+=50})}
+  x.fillStyle='#f4f4f4';x.font='900 38px Doto, monospace';x.fillText('WATCHLOG',PX,H-70);
+  x.beginPath();x.arc(PX+250,H-84,9,0,7);x.fillStyle='#d71921';x.fill();
+  return new Promise(r=>c.toBlob(b=>r(b),'image/png'))}
+
+/* share sheet for one title */
+let shT=null,shBlob=null,shUrl='';
+async function openShare(t){
+  shT=t;$('#shTh').checked=false;$('#shThRow').hidden=!(t.thoughts&&t.thoughts.trim());
+  const files=!!(navigator.canShare&&(()=>{try{return navigator.canShare({files:[new File([''],'a.png',{type:'image/png'})]})}catch(e){return false}})());
+  $('#shImgBtn').textContent=files?'Share image':'Save image';
+  open('shShare');await drawShare()}
+async function drawShare(){
+  $('#shPrev').classList.add('busy');shBlob=await makeCard(shT,$('#shTh').checked);
+  if(shUrl)URL.revokeObjectURL(shUrl);shUrl=shBlob?URL.createObjectURL(shBlob):'';$('#shPrev').src=shUrl;$('#shPrev').classList.remove('busy')}
+$('#shTh').addEventListener('change',drawShare);
+const fileName=t=>'watchlog-'+(slug(String(t.title))||'title')+'.png';
+$('#shImgBtn').addEventListener('click',async()=>{if(!shBlob)return;const f=new File([shBlob],fileName(shT),{type:'image/png'});
+  const ok=await shareFile(f,titleText(shT,false));if(!ok){saveBlob(shBlob,f.name);toast('Image saved to Downloads')}});
+$('#shTxtBtn').addEventListener('click',()=>shareText(titleText(shT,$('#shTh').checked),shT.title));
+$('#shCopy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(titleText(shT,$('#shTh').checked));toast('Copied')}catch(e){toast('Couldn’t copy')}});
+$('#bShare').addEventListener('click',()=>{if(cur)openShare({...cur,thoughts:$('#eTh').value})});
+$('#bToList').addEventListener('click',()=>{if(cur)openPicker([refOf(cur)])});
+
+/* sharing a list: link that opens in Watchlog, or text */
+const b64u=bytes=>{let s='';for(let i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const ub64=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s),o=new Uint8Array(b.length);for(let i=0;i<b.length;i++)o[i]=b.charCodeAt(i);return o};
+async function packList(L){
+  const data={n:L.name,i:L.items.map(e=>{const r=resolve(e)||e;return[e.kind==='series'?1:0,e.tmdb||0,r.title||e.title,+(r.year||e.year)||0,r.poster||e.poster||'',(resolve(e)||{}).rating||0]})};
+  let bytes=new TextEncoder().encode(JSON.stringify(data)),pre='j';
+  if(window.CompressionStream){try{const st=new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(st).arrayBuffer());pre='z'}catch(e){}}
+  return pre+b64u(bytes)}
+async function unpackList(p){
+  let bytes=ub64(p.slice(1));
+  if(p[0]==='z'){const st=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(st).arrayBuffer())}
+  const d=JSON.parse(new TextDecoder().decode(bytes));
+  return{name:String(d.n||'Shared list').slice(0,80),items:(Array.isArray(d.i)?d.i:[]).slice(0,500).map(a=>{const kind=a[0]?'series':'film',tmdb=+a[1]||0;
+    return{key:tmdb?kind+':'+tmdb:'x:'+uid(),tmdb,kind,title:String(a[2]||'').slice(0,200),year:+a[3]||'',poster:/^\/[\w.-]+$/.test(a[4]||'')?a[4]:'',their:+a[5]||0,logId:''}}).filter(e=>e.title)}}
+const appBase=()=>location.origin+location.pathname;
+function shareListSheet(L){
+  actSheet(L.name,[
+    ['Share as Watchlog link',async()=>{const p=await packList(L);shareText(`${L.name} — ${L.items.length} titles\n${appBase()}#list=${p}`,L.name)}],
+    ['Share as text',()=>shareText(manyText(L.items.map(e=>resolve(e)||e),L.name),L.name)],
+    ['Copy link',async()=>{const p=await packList(L);try{await navigator.clipboard.writeText(appBase()+'#list='+p);toast('Link copied')}catch(e){toast('Couldn’t copy')}}]])}
+let actFns=[];
+function actSheet(title,acts){$('#actHead').textContent=title;actFns=acts.map(a=>a[1]);
+  $('#actBtns').innerHTML=acts.map((a,i)=>`<button class="btn ${i?'line':''}" data-a="${i}">${esc(a[0])}</button>`).join('');open('shAct')}
+$('#actBtns').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;close('shAct');actFns[+b.dataset.a]()});
+
+/* receiving a shared list */
+let incoming=null;
+async function checkHash(){
+  const m=location.hash.match(/^#list=([A-Za-z0-9_-]+)$/);if(!m)return;
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  try{incoming=await unpackList(m[1])}catch(e){return toast('That list link looks broken')}
+  if(!incoming.items.length)return toast('That shared list is empty');
+  $('#impHead').textContent=incoming.name;
+  $('#impSub').textContent=`${incoming.items.length} title${incoming.items.length===1?'':'s'} shared with you`;
+  $('#impList').innerHTML=incoming.items.map(e=>{const r=resolve(e);
+    return`<div class="row">${poster({title:e.title,poster:e.poster},'w92')}<span class="rt"><b>${esc(e.title)}</b><small>${esc([e.year,kindL(e.kind)].filter(Boolean).join(' · '))}${r?' · <em>In your log</em>':''}</small></span><span class="sc ${e.their?'':'no'}" title="Their rating">${e.their||'·'}</span></div>`}).join('');
+  $('#impQ').disabled=false;$('#impQ').textContent='Add to my Queue';open('shImp')}
+$('#impSave').addEventListener('click',()=>{if(!incoming)return;const L=newList(incoming.name,incoming.items.map(({their,...e})=>e));close('shImp');
+  ui.kind='lists';ui.list=L.id;document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k==='lists'));render();toast('List saved')});
+$('#impQ').addEventListener('click',async()=>{if(!incoming)return;const todo=incoming.items.filter(e=>!resolve(e));
+  if(!todo.length){toast('You already have all of these');return}
+  const b=$('#impQ');b.disabled=true;let n=0;
+  for(const e of todo){b.textContent=`Adding ${++n} of ${todo.length}…`;
+    let t={id:uid(),tmdb:e.tmdb||undefined,kind:e.kind,title:e.title,year:e.year,poster:e.poster,genres:[],subs:[],cast:[],rating:0,status:'want',date:'',thoughts:'',added:Date.now(),updated:Date.now()};
+    if(e.tmdb){try{const d=await details({id:e.tmdb,media_type:e.kind==='series'?'tv':'movie'});await addImdb(d);Object.entries(d).forEach(([k,v])=>{if(v!==undefined&&v!==''&&v!==null&&k!=='tmdb'&&k!=='kind')t[k]=v})}catch(err){}}
+    items.push(t)}
+  persist();render();changed();b.textContent='Added to your Queue';toast(`Added ${todo.length} to your Queue`)});
+addEventListener('hashchange',checkHash);
+
 /* ---------- layout: phone / split (tablet, phone sideways) / desk (mouse) ---------- */
 let layout='phone';
 function closeEd(){if(layout==='phone'){close('ovEd');cur=null}else{cur=null;edPrev=[];armX(false);renderEd();render()}}
@@ -966,6 +1282,7 @@ document.addEventListener('keydown',e=>{
   const k=e.key,mod=e.ctrlKey||e.metaKey;
   if(mod&&k.toLowerCase()==='s'&&cur&&(layout!=='phone'||$('#ovEd').classList.contains('open'))){e.preventDefault();$('#bSave').click();return}
   if(k==='Escape'){
+    if(selMode&&!stack.some(x=>x!=='ovEd')){endSelect();return}
     if(typing&&e.target.id!=='fq'){e.target.blur();return}
     const top=stack[stack.length-1];
     if(top){if(top.startsWith('sh'))renderEd();close(top);return}
@@ -990,10 +1307,11 @@ document.addEventListener('keydown',e=>{
   if(l==='w'){const o=['watched','watching','want'];cur.status=o[(o.indexOf(cur.status)+1)%3];if(cur.status!=='want'&&!cur.date)cur.date=today();renderEd();return}
   if(l==='t'){e.preventDefault();$('#eTh').focus();return}
   if(l==='s'&&cur.tmdb){$('#bSim').click();return}
+  if(l==='l'){$('#bToList').click();return}
   if(k==='Delete'&&!isNew){$('#bDel').click();return}
 });
 
-load();applyLayout();
+load();loadLists();applyLayout();checkHash();
 document.fonts&&document.fonts.ready.then(()=>{gc.clear();render();renderEd()});
 if(cfg.gh&&cfg.dirty)setTimeout(()=>push().catch(()=>{}),3000);
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
