@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Watchlog</title>
-<meta name="version" content="alpha 0.0.10">
+<meta name="version" content="alpha 0.0.14">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#efefed" media="(prefers-color-scheme: light)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -184,11 +184,6 @@ button:disabled{opacity:.5}
 .pn{color:inherit;font:inherit;padding:0;text-decoration:underline;text-decoration-color:var(--dim);text-underline-offset:3px;text-align:left}
 .coll{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;font-weight:500;color:var(--ink);min-height:28px;text-align:left}
 .coll i{font-style:normal;color:var(--mute)}
-.pgv{font:900 20px var(--dot);color:var(--ink)}.pgv small{font-size:13px;color:var(--mute)}
-.prog{display:flex;align-items:center;gap:8px}
-.prog select{height:40px;border:0;border-radius:20px;background:var(--card);color:var(--ink);font:500 14px var(--sans);padding:0 12px}
-.prog .btn{flex:1}
-.prog .ib{background:var(--card);font-size:20px}
 #gSub{font-size:14px;color:var(--mute);margin:-4px 0 10px}#gSub .big{font:900 24px var(--dot);color:var(--ink)}
 .form select{font:400 16px var(--sans);color:var(--ink);background:var(--card);border:0;border-radius:12px;padding:11px 12px;outline:0;text-transform:none}
 .svc{display:flex;flex-wrap:wrap;gap:6px}
@@ -198,21 +193,36 @@ button:disabled{opacity:.5}
 .svc button.on{box-shadow:inset 0 0 0 2px var(--red)}
 /* discover home */
 #ovAdd.home #fHint{display:none}
-#ovAdd.home .res{gap:14px}
-.dtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:none}
-.dtile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:var(--card);border-radius:16px;padding:12px;text-align:left;min-width:0}
-.dtile .ic{display:flex;gap:3px;margin-bottom:8px}
-.dtile .ic i{width:6px;height:6px;border-radius:50%;background:var(--ink)}
-.dtile .ic i.o{background:var(--dim)}.dtile .ic i.r{background:var(--red)}
-.dtile b{font:900 16px var(--dot);text-transform:uppercase}
-.dtile small{font-size:12px;color:var(--mute);line-height:1.25}
-.dtog{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px;flex:none;margin:-4px 0 -2px}
+#ovAdd.home .res{gap:16px}
+.dpills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex:none;margin-top:4px}
+.dp{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 10px;border-radius:21px;background:var(--card);font:700 14px var(--dot);text-transform:uppercase;white-space:nowrap;color:var(--ink)}
+.dp svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.dp.on{background:var(--red);color:#fff}
+.tgs.hs{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;margin:-2px -16px 12px;padding:2px 16px 4px;align-items:center;min-height:44px}.tgs.hs::-webkit-scrollbar{display:none}.tgs.hs .tog{flex:none}
+.phb{display:flex;align-items:center;gap:6px}.phb .ghost:disabled{opacity:.35}
+.pickq{width:100%;margin:2px 0 8px;height:42px}
+#pkBody .tres{margin-top:4px}
+.dp .fc{display:grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:#fff;color:var(--red);font:700 12px var(--dot);margin-left:-2px}
+:root:not([data-layout=phone]) .dpills{grid-template-columns:repeat(3,minmax(0,170px))}
+.dtog{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;flex:none;margin:-2px 0 14px}
 .dtog label{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;cursor:pointer}
 .dtog input{appearance:none;-webkit-appearance:none;width:40px;height:24px;border-radius:12px;background:var(--dim);position:relative;flex:none;margin:0;transition:background .15s;cursor:pointer}
 .dtog input::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--bg);transition:transform .15s}
 .dtog input:checked{background:var(--red)}.dtog input:checked::after{transform:translateX(16px);background:#fff}
 .dtog input:disabled,.dtog input:disabled+span{opacity:.5;cursor:default}
-.dtog .edl{margin:0;height:32px}
+.dtog .edl{margin:0;height:32px;max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.fbtns .btn:disabled{opacity:.4}
+.fback{height:32px;padding:0;align-self:flex-start;font:700 13px var(--dot);text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+.strow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;background:var(--card);border-radius:12px;padding:0 12px;font:400 16px var(--sans);color:var(--ink);text-align:left}
+.strow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strow i{font-style:normal;color:var(--mute);font-size:22px;line-height:1}
+.form.stf{flex:none;overflow:visible;padding-bottom:4px}
+.stl{flex:1;min-height:0;overflow-y:auto;padding-bottom:8px}
+.stl .lbl{margin:16px 0 8px}
+.stl .stall{width:100%;margin-top:14px}
+.stl .pvnote{margin:0}
+.stl .load{padding:24px 0}
+.stn{flex:none;font-size:12px;color:var(--mute);margin:6px 0 0}
 .drow{flex:none}
 .dh{display:flex;justify-content:space-between;align-items:center;min-height:30px;gap:8px}
 .dh b{font:700 13px var(--dot);color:var(--mute);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -417,7 +427,7 @@ input.lname{font:700 24px var(--sans);width:100%}
   .row:hover,.rc:hover,.gi:hover .pm{background:var(--card)}
   .chip:hover,.tog:hover,.seg button:hover:not(.on),.sort:hover,.ghost:hover,.ib:hover{filter:brightness(1.25)}
   .rate button:hover{outline:2px solid var(--mute);outline-offset:1px}
-  .dnav{display:flex}.dtile:hover,.dc:hover .pm,.dnav button:hover{filter:brightness(1.3)}
+  .dnav{display:flex}.dp:hover,.dc:hover .pm,.dnav button:hover{filter:brightness(1.3)}
   button{cursor:pointer}
 }
 
@@ -483,7 +493,6 @@ input.lname{font:700 24px var(--sans);width:100%}
         <div class="lbl"><span>Status</span><input type="date" class="date" id="eDate" aria-label="Date watched"></div>
         <div class="seg" id="eStat"><button data-s="watched">Watched</button><button data-s="watching">Watching</button><button data-s="want">Want</button></div>
       </div>
-      <div id="eProg"></div>
       <div class="watch" id="eWatch" hidden><div class="lbl"><span>Where to watch</span><span><span id="eWatchR"></span> · <a id="eWatchL" target="_blank" rel="noopener" hidden>JustWatch ↗</a></span></div><div id="eWatchB"></div></div>
       <div>
         <div class="lbl"><span>Categories</span></div>
@@ -516,16 +525,23 @@ input.lname{font:700 24px var(--sans);width:100%}
   </div>
 </div>
 
-<div class="sh" id="shTonight">
+<div class="sh" id="shFilter">
   <div class="sp">
-    <div class="ph"><h2>Tonight</h2><button class="btn ink sm" data-closesh="shTonight">Done</button></div>
+    <div class="ph"><h2>Filter</h2><span class="phb"><button class="ghost" id="fClear">Clear</button><button class="btn ink sm" data-closesh="shFilter">Done</button></span></div>
     <div class="tnb" id="tnBody"></div>
+  </div>
+</div>
+
+<div class="sh" id="shPick">
+  <div class="sp">
+    <div class="ph"><h2>Pick one</h2><button class="btn ink sm" data-closesh="shPick">Done</button></div>
+    <div id="pkBody"></div>
   </div>
 </div>
 
 <div class="sh" id="shTaste">
   <div class="sp" style="height:88dvh">
-    <div class="ph"><h2>Your taste</h2><button class="btn ink sm" data-closesh="shTaste">Done</button></div>
+    <div class="ph"><h2>Stats</h2><button class="btn ink sm" data-closesh="shTaste">Done</button></div>
     <div class="tsb" id="tsBody"></div>
   </div>
 </div>
@@ -583,10 +599,9 @@ input.lname{font:700 24px var(--sans);width:100%}
       <label>OMDb key (IMDb rating)<input id="sOmdb" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Using built-in key"></label>
       <div class="row2"><button class="btn line sm" id="bTestO">Check key</button><span id="sOmdbMsg" style="font-size:14px"></span></div>
       <p>Free at <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" rel="noopener">omdbapi.com → API Key</a> (free plan). A built-in key is already set up; paste your own only if you want to use it instead.</p>
-      <label>Streaming country<select id="sReg"><option value="">Choose…</option></select></label>
-      <label>My services</label>
-      <div class="svc" id="sSvc"></div>
-      <p>Pick the services you use: they’re highlighted on every title, and Discover can show only what you can stream. Streaming data by JustWatch.</p>
+      <label>Where to watch</label>
+      <button type="button" class="strow" id="bStream"><span id="sStreamT">Choose your country</span><i>›</i></button>
+      <p>Your services are highlighted on every title, and Discover can show only what you can stream. Data by JustWatch.</p>
       <label>Posters<div class="seg" id="sPost"><button type="button" data-p="color">Colour</button><button type="button" data-p="bw">Black &amp; white</button></div></label>
       <label>Cloud backup (GitHub)<input id="sGh" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="GitHub token with gist access"></label>
       <div class="row2"><button class="btn line sm" id="bSync">Back up now</button><button class="btn line sm" id="bRest">Restore</button></div>
@@ -613,6 +628,15 @@ input.lname{font:700 24px var(--sans);width:100%}
 </div>
 
 <div class="selbar" id="selBar" hidden><span id="selN"></span><button class="btn sm" id="selList">Add to list</button><button class="btn line sm" id="selShare">Share</button><button class="ib" id="selX" aria-label="Stop selecting"><svg viewBox="0 0 24 24" style="stroke:currentColor;stroke-width:2;fill:none;width:20px;height:20px"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+
+<div class="sh" id="shStream">
+  <div class="sp" style="height:88dvh">
+    <div class="ph"><h2>Streaming</h2><button class="btn ink sm" data-closesh="shStream">Done</button></div>
+    <div class="form stf"><label>Country<select id="sReg"><option value="">Choose…</option></select></label><input id="svQ" placeholder="Search services…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"></div>
+    <div class="stl" id="sSvc"></div>
+    <p class="stn">Streaming data by JustWatch.</p>
+  </div>
+</div>
 
 <div class="sh" id="shList">
   <div class="sp">
@@ -844,7 +868,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date().toISOString().slice(0,10);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const VERSION='alpha 0.0.10';
+const VERSION='alpha 0.0.14';
 const IMG='https://image.tmdb.org/t/p/';
 /* built-in keys (scrambled only to keep them off screen; not secret) */
 const _d=x=>{try{return atob(x.split('').reverse().join(''))}catch(e){return''}};
@@ -876,7 +900,7 @@ async function findGist(){
   for(let page=1;page<=5;page++){const list=await gh('/gists?per_page=100&page='+page);
     const g=list.find(x=>x.description===GDESC&&x.files&&x.files[GFILE]);if(g){cfg.gist=g.id;saveCfg();return gh('/gists/'+g.id)}if(list.length<100)break}
   return null}
-const packed=()=>JSON.stringify({app:'watchlog',version:2,app_version:VERSION,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[],region:cfg.region,services:myServices()},items,lists});
+const packed=()=>JSON.stringify({app:'watchlog',version:2,app_version:VERSION,saved:new Date().toISOString(),cfg:{posters:cfg.posters,hidden:cfg.hidden||[],region:cfg.region,services:cfg.services||[],svcVar:cfg.svcVar||[],svcNames:cfg.svcNames||{}},items,lists});
 async function push(){
   if(resetting||!cfg.gh||syncing)return;syncing=true;
   try{if(!cfg.lastSync){const arr=await pull().catch(e=>{if(e.code==='none')return null;throw e});if(arr)merge(arr)}
@@ -929,7 +953,7 @@ const imgSrc=(p,size)=>IMG+size+p;
 
 const kindL=k=>k==='series'?'Series':'Film';
 const mainCat=t=>{const g=(t.genres||[]).find(x=>GEN[x]);return g?GEN[g].n:''};
-const metaOf=t=>[t.kind==='series'&&t.status==='watching'&&t.prog&&t.prog.e?`S${t.prog.s}E${t.prog.e}`:'',t.year,kindL(t.kind),mainCat(t)].filter(Boolean).join(' · ');
+const metaOf=t=>[t.year,kindL(t.kind),mainCat(t)].filter(Boolean).join(' · ');
 
 /* ---------- TMDB ---------- */
 async function tm(path,params={}){
@@ -1010,7 +1034,7 @@ function render(){
   a=a.slice().sort(by[ui.sort]);listOrder=a;
   if(!items.length){$('#list').innerHTML=`<div class="empty">${poster({title:'W'})}<div>Nothing logged yet.</div><button class="btn" id="bFirst">Add your first title</button>${tmdbKey()?'':'<button class="ghost" id="bKey">Set up TMDB lookups</button>'}</div>`;return}
   if(!a.length){$('#list').innerHTML=`<div class="empty">${ui.kind==='queue'&&!ui.q?'Your queue is empty. Add a title and mark it “Want”.':'Nothing matches.'}</div>`;return}
-  $('#list').innerHTML=a.map(t=>`<button class="row${cur&&cur.id===t.id?' sel':''}${sel.has(t.id)?' pick':''}" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="xc">${t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''}</span><span class="xc">${t.status==='want'?'Queued':esc(fmtDate(t.date))}</span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
+  $('#list').innerHTML=(ui.kind==='queue'&&a.length>1&&!selMode?`<button class="dp pickq" id="bPick">${IC.pick}Pick one for me</button>`:'')+a.map(t=>`<button class="row${cur&&cur.id===t.id?' sel':''}${sel.has(t.id)?' pick':''}" data-id="${esc(t.id)}">${poster(t)}<span class="rt"><b>${esc(t.title)}</b><small>${t.status==='watching'?'<em>Watching</em> · ':''}${esc(metaOf(t))}</small></span><span class="xc">${t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''}</span><span class="xc">${t.status==='want'?'Queued':esc(fmtDate(t.date))}</span><span class="sc ${t.rating?'':'no'}">${t.rating||'·'}</span></button>`).join('')}
 
 $('#kindSeg').addEventListener('click',e=>{const k=e.target.closest('button')?.dataset.k;if(!k)return;if(k==='lists'&&ui.kind==='lists'){ui.list=null;ui.listEdit=false}ui.kind=k;ui.g='';ui.s='';if(k==='lists')endSelect();
   document.querySelectorAll('#kindSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));render();$('#list').scrollTop=0});
@@ -1025,7 +1049,7 @@ $('#sChips').addEventListener('click',e=>{const c=e.target.closest('[data-s]');i
 $('#bSearch').addEventListener('click',()=>{$('#topA').hidden=true;$('#topB').hidden=false;$('#q').focus()});
 $('#bSearchX').addEventListener('click',()=>{ui.q='';$('#q').value='';$('#topB').hidden=true;$('#topA').hidden=false;render()});
 $('#q').addEventListener('input',e=>{ui.q=e.target.value.trim();render()});
-$('#list').addEventListener('click',e=>{if(e.target.closest('#bFirst'))return openAdd();if(e.target.closest('#bKey'))return openSet();
+$('#list').addEventListener('click',e=>{if(e.target.closest('#bPick'))return openPick();if(e.target.closest('#bFirst'))return openAdd();if(e.target.closest('#bKey'))return openSet();
   if(ui.kind==='lists'){listClick(e);return}
   const r=e.target.closest('.row[data-id]');if(!r)return;const id=r.dataset.id;
   if(e.shiftKey&&layout==='desk'){e.preventDefault();if(!selMode)startSelect(cur&&cur.id!==id?cur.id:null);const ids=listOrder.map(t=>t.id),a=ids.indexOf(selAnchor||id),b=ids.indexOf(id);
@@ -1143,7 +1167,7 @@ async function showForYou(){
 function drawForYou(){
   const fyBack='<div class="fy"><button class="ghost" data-home>\u2039 Discover</button><span>For you</span></div>';
   if(fy.err){$('#res').innerHTML=fyBack+`<div class="msg">${ERR[fy.err]||ERR.http}</div>`;return}
-  const L=fy.list||[];
+  const L=(fy.list||[]).filter(e=>!fyAllow||fyAllow.has(e.key));
   if(!L.length){$('#res').innerHTML=fyBack+`<div class="msg">${items.some(t=>t.tmdb&&t.status!=='want')?'No new suggestions right now. Rate a few more titles and check back.':'Suggestions appear here once you\u2019ve added and rated a few titles you found through search.'}</div>`;return}
   const gc={};L.forEach(e=>e.gen.forEach(g=>gc[g]=(gc[g]||0)+1));
   const gs=TAX.filter(g=>gc[g.id]>=2).map(g=>g.id);if(fyG&&!gs.includes(fyG))fyG='';
@@ -1173,7 +1197,7 @@ $('#simGrid').addEventListener('click',async e=>{const b=e.target.closest('.gi')
 const LP='watchlog.prov';let pvC={};try{pvC=JSON.parse(localStorage.getItem(LP)||'{}')}catch(e){}
 let pvSaveT;const pvSave=()=>{clearTimeout(pvSaveT);pvSaveT=setTimeout(()=>{if(resetting)return;try{const k=Object.keys(pvC);if(k.length>800)k.sort((a,b)=>pvC[a].t-pvC[b].t).slice(0,k.length-800).forEach(x=>delete pvC[x]);localStorage.setItem(LP,JSON.stringify(pvC))}catch(e){}},400)};
 const tType=k=>k==='series'||k==='tv'?'tv':'movie';
-const myServices=()=>Array.isArray(cfg.services)?cfg.services:[];
+const myServices=()=>Array.isArray(cfg.services)?[...new Set([...cfg.services,...(cfg.svcVar||[])])]:[];
 const pvKey=(type,id)=>type+':'+id+':'+(cfg.region||'');
 async function provFor(type,id){
   if(!cfg.region||!id)return null;
@@ -1202,7 +1226,7 @@ async function regionServices(){
   const [a,b]=await Promise.all([tm('/watch/providers/movie',{watch_region:cfg.region,language:'en-US'}),tm('/watch/providers/tv',{watch_region:cfg.region,language:'en-US'})]);
   const m=new Map();[...(a.results||[]),...(b.results||[])].forEach(p=>{const pr=(p.display_priorities||{})[cfg.region]??p.display_priority??99,o=m.get(p.provider_id);
     if(!o||pr<o.pr)m.set(p.provider_id,{id:p.provider_id,n:p.provider_name,l:p.logo_path||'',pr})});
-  return[...m.values()].sort((x,y)=>x.pr-y.pr).slice(0,48)}
+  return[...m.values()].sort((x,y)=>x.pr-y.pr)}
 if(cfg.region===undefined){const L=(navigator.languages||[navigator.language||'']).map(x=>String(x).split('-')[1]).find(x=>x&&/^[A-Za-z]{2}$/.test(x));cfg.region=L?L.toUpperCase():''}
 if(!Array.isArray(cfg.services))cfg.services=[];
 
@@ -1211,7 +1235,7 @@ function quietPatch(f){if(!cur)return;Object.assign(cur,f);try{const s0=JSON.par
   if(!isNew){const x=items.find(i=>i.id===cur.id);if(x){Object.assign(x,f);persist()}}}
 function extrasFrom(d,kind){
   if(kind==='series')return{ppl:{creator:(d.created_by||[]).slice(0,2).map(p=>({id:p.id,n:p.name})),cast:(d.credits?.cast||[]).slice(0,3).map(p=>({id:p.id,n:p.name}))},
-    sInfo:(d.seasons||[]).filter(s=>s.season_number>0&&s.episode_count>0).map(s=>[s.season_number,s.episode_count]),coll:null,xv:1};
+    coll:null,xv:1};
   return{ppl:{creator:(d.credits?.crew||[]).filter(x=>x.job==='Director').slice(0,2).map(p=>({id:p.id,n:p.name})),cast:(d.credits?.cast||[]).slice(0,3).map(p=>({id:p.id,n:p.name}))},
     coll:d.belongs_to_collection?{id:d.belongs_to_collection.id,n:d.belongs_to_collection.name}:null,xv:1}}
 async function enrichCur(){
@@ -1232,17 +1256,6 @@ function peopleHTML(){
   const b=(p,role)=>`<button class="pn" data-pn="${esc(p.n)}" data-pid="${p.id||''}" data-pr="${role}">${esc(p.n)}</button>`;
   const c=(P.creator||[]).map(p=>b(p,'crew')).join(', '),a=(P.cast||[]).map(p=>b(p,'cast')).join(', ');
   return c||a?`<p class="cr">${[c,a].filter(Boolean).join(' · ')}</p>`:''}
-function progHTML(){
-  if(cur.kind!=='series'||cur.status==='want')return'';
-  const pr=cur.prog||{s:1,e:0},si=cur.sInfo||[],cnt=(si.find(x=>x[0]===pr.s)||[])[1]||0,seasons=si.length?si.map(x=>x[0]):Array.from({length:+cur.seasons||1},(_,i)=>i+1);
-  return`<div class="lbl"><span>Progress</span><span class="pgv">${pr.e?`S${pr.s} · E${pr.e}`:'Not started'}${cnt?`<small> / ${cnt}</small>`:''}</span></div>
-  <div class="prog"><select id="pgS" aria-label="Season">${seasons.map(s=>`<option value="${s}"${s===pr.s?' selected':''}>Season ${s}</option>`).join('')}</select>
-  <button class="ib" data-pg="prev" aria-label="Previous episode">−</button><button class="btn line sm" data-pg="next">${pr.e?'Next episode':'Watched episode 1'}</button></div>`}
-function progStep(d){
-  const pr={...(cur.prog||{s:1,e:0})},si=cur.sInfo||[],cnt=(si.find(x=>x[0]===pr.s)||[])[1]||0;
-  if(d<0){pr.e=Math.max(0,pr.e-1)}
-  else{pr.e++;if(cnt&&pr.e>cnt){const nx=si.find(x=>x[0]>pr.s);if(nx){pr.s=nx[0];pr.e=1}else{pr.e=cnt;cur.prog=pr;cur.status='watched';if(!cur.date)cur.date=today();renderEd();return toast('Series finished — marked as watched. Save to keep it.')}}}
-  cur.prog=pr;if(cur.status!=='watching'&&pr.e>0&&cur.status!=='watched')cur.status='watching';renderEd()}
 
 /* person and franchise sheets (a grid of titles you can open) */
 let gridList=[],gridBusy=false;
@@ -1293,6 +1306,53 @@ const ckey=c=>c.media_type+':'+c.id;
 function mix(...ls){const o=[],seen=new Set(),n=Math.max(0,...ls.map(l=>l.length));for(let i=0;i<n;i++)ls.forEach(l=>{const c=l[i];if(c&&!seen.has(ckey(c))){seen.add(ckey(c));o.push(c)}});return o}
 async function disc(mt,params){const p={language:'en-US',include_adult:'false'};Object.entries(params).forEach(([k,v])=>{if(v!==''&&v!=null)p[k]=v});
   const d=await tm(`/discover/${mt}`,p);return(d.results||[]).map(c=>({...c,media_type:mt}))}
+
+/* filter: mood + length + only on my services; applies to every row, Swipe and Pick one */
+const MOODS={any:{n:'Any'},mind:{n:'Mind-bending',g:['mystery'],s:['scifi.mind-bending','mystery.puzzle-box','scifi.time-travel','scifi.multiverse','scifi.simulation-and-vr'],tm:[878,9648],tv:[10765,9648]},
+  edge:{n:'Edge of my seat',g:['thriller','action','horror'],tm:[53,28,27],tv:[10759,80]},funny:{n:'Light & funny',g:['comedy','animation','family'],tm:[35,16],tv:[35,16]},
+  epic:{n:'Epic',g:['adventure','fantasy','war'],s:['scifi.space-opera','fantasy.epic'],tm:[12,14,10752],tv:[10759,10765]},moving:{n:'Moving',g:['drama','romance'],tm:[18,10749],tv:[18]},
+  dark:{n:'Dark',g:['crime','horror'],s:['crime.noir-and-neo-noir','fantasy.grimdark','drama.grief-and-loss','scifi.dystopian'],tm:[80,27,53],tv:[80,9648]},
+  cosy:{n:'Cosy',g:['family','animation','comedy','romance'],tm:[10751,16,35,10749],tv:[10751,35]}};
+const TYPES=[['any','Films & series'],['film','Films'],['series','Series']];
+const LENS=[['any','Any'],['90','Under 1½ h'],['120','Under 2 h']];
+const DECS=[['any','Any'],['new','Last 2 years'],['2020','2020s'],['2010','2010s'],['2000','2000s'],['1990','1990s'],['1980','1980s'],['old','Older']];
+const RATES=[['any','Any'],['6','6+'],['7','7+'],['8','8+']];
+const F0={mood:'any',type:'any',len:'any',g:'',s:'',dec:'any',rate:'any'};
+let flt={...F0};
+const fCount=()=>Object.keys(F0).filter(k=>flt[k]!==F0[k]).length+(streamOn()?1:0);
+const fSig=()=>Object.keys(F0).map(k=>flt[k]).join('/')+'/'+(streamOn()?'s'+myServices().join(','):'')+'/'+(cfg.region||'');
+const lenMins=()=>/^\d+$/.test(flt.len)?+flt.len:0;
+const wantMt=mt=>flt.type==='film'||lenMins()?mt==='movie':flt.type==='series'?mt==='tv':true;
+const yrRange=()=>{const y=new Date().getFullYear(),d=flt.dec;return d==='any'?null:d==='new'?[y-2,y+1]:d==='old'?[1800,1979]:[+d,+d+9]};
+const rateOf=c=>{const v=imC[imKey(c)];return imFresh(v)&&v.r?v.r:(c.vote_count||0)>=20?c.vote_average||0:0};
+const genreMtId=(g,mt)=>(mt==='tv'?TVG:MG)[g]||0;
+const okC=c=>{if(!wantMt(c.media_type))return false;
+  if(flt.mood!=='any'){const M=MOODS[flt.mood],L=c.media_type==='tv'?M.tv:M.tm;if(!(c.genre_ids||[]).some(g=>L.includes(g)))return false}
+  if(flt.g&&!ourG(c.genre_ids).includes(flt.g))return false;
+  const r=yrRange();if(r){const y=+cyear(c);if(!y||y<r[0]||y>r[1])return false}
+  if(flt.rate!=='any'&&rateOf(c)<+flt.rate)return false;
+  return true};
+async function fltP(mt){const p={};
+  if(flt.g){p.with_genres=genreMtId(flt.g,mt)||-1}else if(flt.mood!=='any'){const M=MOODS[flt.mood];p.with_genres=(mt==='tv'?M.tv:M.tm).join('|')}
+  if(flt.s){const k=await kwId(flt.s);if(k)p.with_keywords=k}
+  const r=yrRange();if(r){const a=mt==='movie'?'primary_release_date':'first_air_date';p[a+'.gte']=r[0]+'-01-01';p[a+'.lte']=r[1]+'-12-31'}
+  if(flt.rate!=='any'){p['vote_average.gte']=+flt.rate;p['vote_count.gte']=100}
+  if(mt==='movie'&&lenMins())p['with_runtime.lte']=lenMins();return p}
+async function discBoth(mp,tp){const one=async(mt,b)=>{if(!wantMt(mt))return[];const f=await fltP(mt);if(f.with_genres===-1)return[];
+    const p={...b,...streamP(),...f};if(b.with_keywords&&f.with_keywords&&b.with_keywords!==f.with_keywords)p.with_keywords=b.with_keywords+','+f.with_keywords;
+    if(f['vote_average.gte']&&b['vote_average.gte'])p['vote_average.gte']=Math.max(b['vote_average.gte'],f['vote_average.gte']);
+    for(const a of['primary_release_date','first_air_date']){if(b[a+'.gte']&&f[a+'.gte']){p[a+'.gte']=b[a+'.gte']>f[a+'.gte']?b[a+'.gte']:f[a+'.gte'];p[a+'.lte']=b[a+'.lte']<f[a+'.lte']?b[a+'.lte']:f[a+'.lte']}}
+    return disc(mt,p)};
+  const[a,b]=await Promise.all([one('movie',mp),one('tv',tp)]);return mix(a,b)}
+/* runtime + our subcategories for a suggestion, fetched once and remembered */
+let mtC={};try{mtC=JSON.parse(localStorage.getItem('watchlog.meta')||'{}')}catch(e){}
+let mtT;async function metaC(c){const k=ckey(c);if(mtC[k])return mtC[k];
+  try{const d=await tm(`/${c.media_type}/${c.id}`,{append_to_response:'keywords',language:'en-US'});
+    const kw=((d.keywords&&(d.keywords.keywords||d.keywords.results))||[]).map(x=>x.name).join(' | ').toLowerCase();
+    const cat=categorise((d.genres||[]).map(x=>x.id),kw.split('|').length>=3?kw:kw+' || '+String(d.overview||'').toLowerCase(),d.original_language);
+    mtC[k]={rt:d.runtime||0,s:cat.subs||[]};clearTimeout(mtT);mtT=setTimeout(()=>{if(resetting)return;try{const ks=Object.keys(mtC);if(ks.length>2500)ks.slice(0,ks.length-2500).forEach(x=>delete mtC[x]);localStorage.setItem('watchlog.meta',JSON.stringify(mtC))}catch(e){}},600);return mtC[k]}
+  catch(e){return{rt:0,s:[]}}}
+
 const KWQ={'scifi.ai-and-robots':'artificial intelligence','scifi.hard-sf':'hard science fiction','scifi.dystopian':'dystopia','scifi.post-apocalyptic':'post-apocalyptic future','scifi.clones-and-identity':'clone','scifi.simulation-and-vr':'virtual reality','scifi.space-exploration':'space travel','scifi.mind-bending':'mind-bending','scifi.military-sf':'military science fiction','scifi.alternate-history':'alternate history','scifi.climate-fiction':'climate change','scifi.mutants-and-powers':'superpower','scifi.pandemic-and-outbreak':'pandemic','scifi.space-horror':'space horror','scifi.near-future':'near future','scifi.far-future':'distant future','crime.noir-and-neo-noir':'neo-noir','horror.body-horror':'body horror','fantasy.epic':'epic fantasy','fantasy.dark':'dark fantasy','comedy.dark-comedy':'dark comedy','thriller.psychological':'psychological thriller'};
 async function kwId(s){let m={};try{m=JSON.parse(localStorage.getItem('watchlog.kw')||'{}')}catch(e){}
   if(s in m)return m[s];
@@ -1300,59 +1360,64 @@ async function kwId(s){let m={};try{m=JSON.parse(localStorage.getItem('watchlog.
   const r=(await tm('/search/keyword',{query:q})).results||[];
   const hit=r.find(x=>x.name.toLowerCase()===q)||r.find(x=>x.name.toLowerCase().startsWith(q))||r[0];
   m[s]=hit?hit.id:0;try{if(!resetting)localStorage.setItem('watchlog.kw',JSON.stringify(m))}catch(e){}return m[s]}
-async function rowSub(s){const id=await kwId(s);if(!id)return[];const sp=streamP();
-  const[a,b]=await Promise.all([disc('movie',{with_keywords:id,sort_by:'vote_average.desc','vote_count.gte':150,...sp}),disc('tv',{with_keywords:id,sort_by:'vote_average.desc','vote_count.gte':40,...sp})]);return mix(a,b)}
+async function rowSub(s){const id=await kwId(s);if(!id)return[];return discBoth({with_keywords:id,sort_by:'vote_average.desc','vote_count.gte':150},{with_keywords:id,sort_by:'vote_average.desc','vote_count.gte':40})}
 async function rowTrending(){const d=await tm('/trending/all/week',{language:'en-US'});return(d.results||[]).filter(c=>c.media_type==='movie'||c.media_type==='tv')}
 async function rowSoon(){const gs=topGenres(3),p={sort_by:'popularity.desc'};
-  const[a,b]=await Promise.all([disc('movie',{...p,'primary_release_date.gte':isoDay(1),'primary_release_date.lte':isoDay(200),with_genres:gq(gs,MG),region:cfg.region||''}),disc('tv',{...p,'first_air_date.gte':isoDay(1),'first_air_date.lte':isoDay(200),with_genres:gq(gs,TVG)})]);
-  const d=c=>String(c.release_date||c.first_air_date||'9');return mix(a,b).sort((x,y)=>d(x).localeCompare(d(y)))}
-async function rowGems(){const gs=topGenres(3),sp=streamP();
-  const[a,b]=await Promise.all([disc('movie',{with_genres:gq(gs,MG),'vote_average.gte':7.3,'vote_count.gte':80,'vote_count.lte':1500,sort_by:'vote_average.desc',...sp}),disc('tv',{with_genres:gq(gs,TVG),'vote_average.gte':7.8,'vote_count.gte':40,'vote_count.lte':600,sort_by:'vote_average.desc',...sp})]);return mix(a,b)}
+  const L=await discBoth({...p,'primary_release_date.gte':isoDay(1),'primary_release_date.lte':isoDay(200),with_genres:gq(gs,MG),region:cfg.region||''},{...p,'first_air_date.gte':isoDay(1),'first_air_date.lte':isoDay(200),with_genres:gq(gs,TVG)});
+  const d=c=>String(c.release_date||c.first_air_date||'9');return L.sort((x,y)=>d(x).localeCompare(d(y)))}
+async function rowGems(){const gs=topGenres(3);
+  return discBoth({with_genres:gq(gs,MG),'vote_average.gte':7.3,'vote_count.gte':80,'vote_count.lte':1500,sort_by:'vote_average.desc'},{with_genres:gq(gs,TVG),'vote_average.gte':7.8,'vote_count.gte':40,'vote_count.lte':600,sort_by:'vote_average.desc'})}
+async function rowFocus(){return discBoth({sort_by:'popularity.desc','vote_average.gte':7,'vote_count.gte':300},{sort_by:'popularity.desc','vote_average.gte':7.4,'vote_count.gte':100})}
 function homeDefs(){const d=[];
+  const ft=[flt.s?SUB[flt.s].l:flt.g?GEN[flt.g].n:'',flt.mood!=='any'?MOODS[flt.mood].n:''].filter(Boolean).join(' \u00b7 ');
+  if(ft)d.push({k:'focus',t:ft,get:rowFocus,server:true});
   d.push({k:'fy',t:'For you',more:true,get:async()=>{const sig=fySig();if(!fy.list||fy.sig!==sig)fy={sig,list:await buildForYou(),err:''};return fy.list.map(e=>e.c)}});
   items.filter(t=>t.tmdb&&t.status!=='want'&&t.rating>=8).sort((a,b)=>b.rating-a.rating||(b.updated||b.added||0)-(a.updated||a.added||0)).slice(0,2)
     .forEach(t=>d.push({k:'bc:'+t.kind+t.tmdb,t:`Because you loved ${t.title}`,get:()=>recsFor(t.tmdb,t.kind)}));
-  topSubs(3).forEach(s=>d.push({k:'sub:'+s,t:`More ${SUB[s].l}`,get:()=>rowSub(s),server:true}));
+  if(!flt.s)topSubs(3).forEach(s=>d.push({k:'sub:'+s,t:`More ${SUB[s].l}`,get:()=>rowSub(s),server:true}));
   d.push({k:'trend',t:'Trending this week',get:rowTrending});
-  if(!streamOn())d.push({k:'soon',t:'Coming soon',soon:true,get:rowSoon});
+  if(!streamOn()&&flt.len==='any')d.push({k:'soon',t:'Coming soon',soon:true,get:rowSoon,server:true});
   d.push({k:'gems',t:'Hidden gems',get:rowGems,server:true});
   return d}
 async function pmap(arr,fn,n){const out=new Array(arr.length);let i=0;await Promise.all(Array.from({length:Math.min(n,arr.length)},async()=>{while(i<arr.length){const j=i++;out[j]=await fn(arr[j])}}));return out}
 const rowP=new Map();
-async function rowData(def){const key=def.k+'|'+(def.k==='fy'?fySig():'')+'|'+(streamOn()?'s'+myServices().join(','):'')+'|'+(cfg.region||'');
-  if(!rowP.has(key))rowP.set(key,(async()=>{let L=await def.get();if(streamOn()&&!def.server){L=L.slice(0,30);const ok=await pmap(L,onMine,6);L=L.filter((c,i)=>ok[i])}return L})());
+async function rowData(def){const key=def.k+'|'+(def.k==='fy'?fySig():'')+'|'+fSig();
+  if(!rowP.has(key))rowP.set(key,(async()=>{let L=(await def.get()).filter(okC);
+    if(!def.server&&(lenMins()||flt.s)){L=L.filter(fresh).slice(0,30);const m=await pmap(L,metaC,6);L=L.filter((c,i)=>(!lenMins()||(m[i].rt>0&&m[i].rt<=lenMins()))&&(!flt.s||m[i].s.includes(flt.s)))}
+    if(streamOn()&&!def.server){L=L.filter(fresh).slice(0,30);const ok=await pmap(L,onMine,6);L=L.filter((c,i)=>ok[i])}
+    return L})());
   try{return await rowP.get(key)}catch(e){rowP.delete(key);throw e}}
-function homeReset(){rowP.clear();if(mode==='home'&&$('#ovAdd').classList.contains('open'))drawHome()}
+function homeReset(){rowP.clear();if(mode==='home'&&$('#ovAdd').classList.contains('open'))drawHome();if($('#shFilter').classList.contains('open'))drawFilter()}
 const hiddenSet=()=>new Set(cfg.hidden||[]);
 const fresh=c=>!inLog(c)&&!hiddenSet().has(ckey(c));
 const fmtSoon=c=>{const d=c.release_date||c.first_air_date;if(!d)return'';const x=new Date(d+'T12:00');return isNaN(x)?'':x.toLocaleDateString(undefined,{day:'numeric',month:'short',year:x.getFullYear()!==new Date().getFullYear()?'numeric':undefined})};
-const dcard=(c,i,j,d)=>`<button class="dc" data-r="${i}" data-j="${j}">${poster({title:ctitle(c),poster:c.poster_path},'w185')}<b>${esc(ctitle(c))}</b><small>${d.soon?esc(fmtSoon(c)):esc(cyear(c))}${d.soon?'':imr(c)}</small></button>`;
-const tileDots=pat=>`<span class="ic">${pat.split('').map(x=>`<i class="${x==='r'?'r':x==='1'?'':'o'}"></i>`).join('')}</span>`;
+const dcard=(c,i,j,d)=>`<button class="dc" data-r="${i}" data-j="${j}" data-k="${ckey(c)}">${poster({title:ctitle(c),poster:c.poster_path},'w185')}<b>${esc(ctitle(c))}</b><small>${d.soon?esc(fmtSoon(c)):esc(cyear(c))}${d.soon?'':imr(c)}</small></button>`;
+const IC={pick:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg>',filter:'<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',swipe:'<svg viewBox="0 0 24 24"><path d="M7 7 3 11l4 4M17 9l4 4-4 4M3 11h12M9 13h12"/></svg>',stats:'<svg viewBox="0 0 24 24"><path d="M6 20v-8M12 20V5M18 20v-5"/></svg>'};
+function pillsHTML(){const n=fCount();return`<button class="dp${n?' on':''}" data-tile="filter">${IC.filter}Filter${n?`<span class="fc">${n}</span>`:''}</button><button class="dp" data-tile="swipe">${IC.swipe}Swipe</button><button class="dp" data-tile="taste">${IC.stats}Stats</button>`}
+const drawPills=()=>{const p=$('#res .dpills');if(p)p.innerHTML=pillsHTML()};
 let homeDefsCur=[],homeErr='';
-function drawHome(){
-  mode='home';homeErr='';$('#ovAdd').classList.add('home');const keep=$('#res').scrollTop;const defs=homeDefs();homeDefsCur=defs;
-  const ready=cfg.region&&myServices().length;
-  $('#res').innerHTML=`<div class="dtiles">
-    <button class="dtile" data-tile="swipe">${tileDots('0110r')}<b>Swipe</b><small>Quick picks</small></button>
-    <button class="dtile" data-tile="tonight">${tileDots('r0110')}<b>Tonight</b><small>What to watch</small></button>
-    <button class="dtile" data-tile="taste">${tileDots('101r1')}<b>Taste</b><small>Your stats</small></button></div>
-    <div class="dtog"><label><input type="checkbox" id="dStream"${streamOn()?' checked':''}${ready?'':' disabled'}><span>Only on my services</span></label>${ready?'':'<button class="edl" data-goset>Set up \u203a</button>'}</div>`+
+function drawHome(top){
+  mode='home';homeErr='';fyAllow=null;$('#ovAdd').classList.add('home');const keep=top?0:$('#res').scrollTop;const defs=homeDefs();homeDefsCur=defs;
+  $('#res').innerHTML=`<div class="dpills">${pillsHTML()}</div>`+
     defs.map((d,i)=>`<section class="drow" data-row="${i}"><div class="dh"><b>${esc(d.t)}</b><span class="dnav"><button data-dn="-1" aria-label="Scroll left">‹</button><button data-dn="1" aria-label="Scroll right">›</button></span>${d.more?'<button class="ghost" data-seeall>See all ›</button>':''}</div><div class="dstrip">${'<span class="dc sk"><span class="pm"></span></span>'.repeat(5)}</div></section>`).join('');
   $('#res').scrollTop=keep;defs.forEach((d,i)=>loadRow(d,i))}
 async function loadRow(d,i){
   let L=null;try{L=await rowData(d)}catch(e){if(e&&e.code)homeErr=e.code}
   if(homeDefsCur[i]!==d||mode!=='home')return;const sec=document.querySelector(`#res .drow[data-row="${i}"]`);if(!sec)return;
   const list=(L||[]).filter(fresh).slice(0,20);d.items=list;
-  if(list.length<3){sec.remove();if(!document.querySelector('#res .drow')&&!$('#res .msg'))$('#res').insertAdjacentHTML('beforeend',`<div class="msg">${homeErr?ERR[homeErr]||ERR.http:'Nothing to suggest yet. Search for a few titles you love and rate them.'}</div>`);return}
+  if(list.length<3){sec.remove();if(!document.querySelector('#res .drow')&&!$('#res .msg'))$('#res').insertAdjacentHTML('beforeend',homeErr?`<div class="msg">${ERR[homeErr]||ERR.http}</div>`:fCount()?'<div class="msg">Nothing matches these filters.<br><br><button class="btn line sm" data-fclear>Clear filters</button></div>':'<div class="msg">Nothing to suggest yet. Search for a few titles you love and rate them.</div>');return}
   sec.querySelector('.dstrip').innerHTML=list.map((c,j)=>dcard(c,i,j,d)).join('');if(!d.soon)fillImdb(list)}
+let fyAllow=null;
 async function homeClick(e){
-  const tile=e.target.closest('[data-tile]');if(tile){const t=tile.dataset.tile;if(t==='swipe')openSwipe();else if(t==='tonight')openTonight();else openTaste();return}
-  if(e.target.closest('[data-goset]')){openSet();return}
+  const tile=e.target.closest('[data-tile]');if(tile){const t=tile.dataset.tile;if(t==='swipe')openSwipe();else if(t==='filter')openFilter();else openTaste();return}
+  if(e.target.closest('[data-fclear]')){clearFilters();return}
   const dn=e.target.closest('[data-dn]');if(dn){const st=dn.closest('.drow').querySelector('.dstrip');st.scrollBy({left:+dn.dataset.dn*st.clientWidth*.8,behavior:'smooth'});return}
-  if(e.target.closest('[data-seeall]')){mode='fy';$('#ovAdd').classList.remove('home');showForYou();$('#res').scrollTop=0;return}
+  if(e.target.closest('[data-seeall]')){const d=homeDefsCur.find(x=>x.k==='fy');fyAllow=fCount()&&d?new Set((await rowData(d).catch(()=>[])).map(ckey)):null;
+    mode='fy';$('#ovAdd').classList.remove('home');showForYou();$('#res').scrollTop=0;return}
   const c=e.target.closest('.dc[data-r]');if(!c||busy)return;const d=homeDefsCur[+c.dataset.r],it=d&&d.items&&d.items[+c.dataset.j];if(!it)return;
   busy=true;c.classList.add('busy');try{await openTmdb(it,false);leaveAdd()}catch(err){toast(ERR[err&&err.code]||ERR.http)}c.classList.remove('busy');busy=false}
-$('#res').addEventListener('change',e=>{if(e.target.id!=='dStream')return;cfg.streamOnly=e.target.checked;saveCfg();drawHome()});
+function filtersChanged(){drawPills();if($('#ovAdd').classList.contains('open')&&mode==='home')drawHome(true);if($('#shFilter').classList.contains('open'))drawFilter()}
+function clearFilters(){flt={...F0};cfg.streamOnly=false;saveCfg();filtersChanged()}
 
 /* ---------- Swipe ---------- */
 let deck=[],deckI=0,swUndo=[],swBusy=false,swSeen=null;
@@ -1368,7 +1433,7 @@ function sCard(c,cls){const g=ourG(c.genre_ids).map(x=>GEN[x].n)[0];
   <div class="sinfo"><h3>${esc(ctitle(c))}</h3><div class="sm">${esc([cyear(c),kindL(ckind(c)),g].filter(Boolean).join(' · '))}${imr(c)}</div><p>${esc(c.overview||'')}</p><div class="spv"></div></div></div>`}
 function drawDeck(){
   const box=$('#deck'),c=deck[deckI],n=deck[deckI+1];$('#swUndo').disabled=!swUndo.length;
-  $('#swLeft').textContent=c?`${deck.length-deckI} left`:'';
+  $('#swLeft').textContent=c?`${deck.length-deckI} left${fCount()?' \u00b7 filtered':''}`:'';
   if(!c){box.innerHTML='<div class="msg">That’s everything for now. Rate a few more titles and come back for new suggestions.</div>';$('#swBtns').classList.toggle('off',!swUndo.length);$('#swBtns').classList.add('done');return}
   $('#swBtns').classList.remove('off','done');box.innerHTML=(n?sCard(n,'next'):'')+sCard(c,'top');fillImdb([c]);
   if(cfg.region)provFor(c.media_type==='tv'?'tv':'movie',c.id).then(p=>{const el=box.querySelector('.top .spv');if(!el||deck[deckI]!==c||!p)return;const s=myServices(),mine=p.s.filter(x=>s.includes(x.id));
@@ -1408,53 +1473,80 @@ $('#swRate').addEventListener('click',e=>{const b=e.target.closest('[data-sr]');
 $('#swRateDots').innerHTML=Array.from({length:10},(_,i)=>`<button data-sr="${i+1}" aria-label="${i+1} out of 10">${i+1}</button>`).join('');
 function refreshSwipe(){if(!$('#ovSwipe').classList.contains('open')||!deck.length||swSeen)return;let moved=false;while(deck[deckI]&&!fresh(deck[deckI])){deckI++;moved=true}if(moved)drawDeck()}
 
-/* ---------- Tonight ---------- */
-const MOODS={any:{n:'Anything'},mind:{n:'Mind-bending',g:['mystery'],s:['scifi.mind-bending','mystery.puzzle-box','scifi.time-travel','scifi.multiverse','scifi.simulation-and-vr'],tm:[878,9648],tv:[10765,9648]},
-  edge:{n:'Edge of my seat',g:['thriller','action','horror'],tm:[53,28,27],tv:[10759,80]},funny:{n:'Light & funny',g:['comedy','animation','family'],tm:[35,16],tv:[35,16]},
-  epic:{n:'Epic',g:['adventure','fantasy','war'],s:['scifi.space-opera','fantasy.epic'],tm:[12,14,10752],tv:[10759,10765]},moving:{n:'Moving',g:['drama','romance'],tm:[18,10749],tv:[18]},
-  dark:{n:'Dark',g:['crime','horror'],s:['crime.noir-and-neo-noir','fantasy.grimdark','drama.grief-and-loss','scifi.dystopian'],tm:[80,27,53],tv:[80,9648]},
-  cosy:{n:'Cosy',g:['family','animation','comedy','romance'],tm:[10751,16,35,10749],tv:[10751,35]}};
-const TIMES=[['any','Any length'],['90','Under 1½ h'],['120','Under 2 h'],['ep','An episode']];
-let tn={mood:'any',time:'any',src:'both'},tnPool=[],tnI=0,tnBusy=false;
-function openTonight(){tnPool=[];tnI=0;drawTonight();open('shTonight')}
-function moodFits(t,m){if(m==='any')return true;const M=MOODS[m];return(t.subs||[]).some(s=>(M.s||[]).includes(s))||(t.genres||[]).some(g=>(M.g||[]).includes(g))||(!(t.subs||[]).length&&(M.tm||[]).includes(MG[(t.genres||[])[0]]))}
-function timeFits(t,tm){if(tm==='any')return true;if(tm==='ep')return t.kind==='series';return t.kind==='film'&&(!t.runtime||+t.runtime<=+tm+5)}
-function drawTonight(){
-  const can=cfg.region&&myServices().length;if(!can)tn.src='queue';const ch=(k,v,l)=>`<button class="tog${tn[k]===v?' on':''}" data-tk="${k}" data-tv="${v}">${l}</button>`;
-  $('#tnBody').innerHTML=`<div class="lbl"><span>Mood</span></div><div class="tgs">${Object.entries(MOODS).map(([k,m])=>ch('mood',k,m.n)).join('')}</div>
-    <div class="lbl"><span>Time</span></div><div class="tgs">${TIMES.map(([k,l])=>ch('time',k,l)).join('')}</div>
-    <div class="lbl"><span>From</span></div><div class="tgs">${ch('src','queue','My Queue')}${can?ch('src','stream','My services')+ch('src','both','Both'):''}</div>
-    ${can?'':'<p class="pvnote">Add your streaming services in Settings to get picks from them too.</p>'}
-    <button class="btn" id="tnGo">Pick for me</button><div id="tnRes"></div>`}
-async function tonightPool(){
-  const pool=[],src=tn.src;
-  if(src!=='stream'){items.filter(t=>(t.status==='want'||(t.status==='watching'&&t.kind==='series'))&&moodFits(t,tn.mood)&&timeFits(t,tn.time))
-    .sort(()=>Math.random()-.5).forEach(t=>pool.push({t,why:t.status==='watching'?`Continue${t.prog&&t.prog.e?` — next up S${t.prog.s} E${t.prog.e+1}`:''}`:'From your Queue'}))}
-  if(src!=='queue'&&cfg.region&&myServices().length){
-    const M=MOODS[tn.mood],page=1+Math.floor(Math.random()*3),base={sort_by:'popularity.desc','vote_average.gte':6.8,'vote_count.gte':300,page,with_watch_providers:myServices().join('|'),watch_region:cfg.region,with_watch_monetization_types:'flatrate|free|ads'};
-    const jobs=[];if(tn.time!=='ep')jobs.push(disc('movie',{...base,with_genres:(M.tm||[]).join('|'),'with_runtime.lte':tn.time==='any'?'':tn.time}));
-    if(tn.time==='any'||tn.time==='ep')jobs.push(disc('tv',{...base,'vote_count.gte':120,with_genres:(M.tv||[]).join('|')}));
-    const res=(await Promise.all(jobs.map(j=>j.catch(()=>[])))).flat().filter(fresh).sort(()=>Math.random()-.5).slice(0,20);
-    res.forEach(c=>pool.push({c,why:''}))}
-  return pool}
-async function tonightPick(next){
-  if(tnBusy)return;tnBusy=true;const box=$('#tnRes');
-  if(!next||!tnPool.length){box.innerHTML='<div class="load"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';try{tnPool=await tonightPool()}catch(e){tnPool=[]}tnI=0}else tnI=(tnI+1)%tnPool.length;
-  const p=tnPool[tnI];tnBusy=false;
-  if(!p){box.innerHTML=`<div class="msg">Nothing fits that combination. Try another mood or time${tn.src==='queue'?', or add titles to your Queue':''}.</div>`;return}
-  const t=p.t||{title:ctitle(p.c),year:cyear(p.c),kind:ckind(p.c),poster:p.c.poster_path,synopsis:p.c.overview,runtime:''};
-  const meta=[t.year,kindL(t.kind),t.kind==='film'&&t.runtime?t.runtime+' min':''].filter(Boolean).join(' · ');
-  box.innerHTML=`<div class="tres">${poster(t.poster?t:{title:t.title},'w342')}<div><span class="tcount">${tnI+1} / ${tnPool.length}</span><h3>${esc(t.title)}</h3><p class="mt">${esc(meta)}</p><p class="why2" id="tnWhy">${esc(p.why)}</p><p class="syn">${esc(t.synopsis||'')}</p></div></div>
-    <div class="shrow"><button class="btn line" id="tnNext">Another</button><button class="btn ink" id="tnOpen">Open</button></div>`;
-  const c=p.c||(t.tmdb?{id:t.tmdb,media_type:t.kind==='series'?'tv':'movie'}:null);
-  if(c&&cfg.region)provFor(c.media_type==='tv'?'tv':'movie',c.id).then(v=>{const el=$('#tnWhy');if(!el||tnPool[tnI]!==p||!v)return;const s=myServices(),mine=v.s.filter(x=>s.includes(x.id));
-    if(mine.length)el.innerHTML=(p.why?esc(p.why)+' · ':'')+`on your <b>${esc(mine.map(x=>x.n).join(', '))}</b>`}).catch(()=>{})}
-$('#tnBody').addEventListener('click',async e=>{
-  const b=e.target.closest('[data-tk]');if(b){tn[b.dataset.tk]=b.dataset.tv;tnPool=[];drawTonight();return}
-  if(e.target.id==='tnGo'){tonightPick(false);return}
-  if(e.target.id==='tnNext'){tonightPick(true);return}
-  if(e.target.id==='tnOpen'){const p=tnPool[tnI];if(!p)return;close('shTonight');if($('#ovAdd').classList.contains('open')&&layout!=='phone')close('ovAdd');
-    if(p.t)selectItem(p.t);else{try{await openTmdb(p.c,false)}catch(err){toast(ERR[err&&err.code]||ERR.http)}}}});
+/* ---------- Filter sheet ---------- */
+function openFilter(){drawFilter();open('shFilter');$('#tnBody').scrollTop=0}
+const svcSummary=()=>{const n=myNames(),c=(cfg.services||[]).length;return n.length===c&&c?n.slice(0,2).join(', ')+(c>2?` +${c-2}`:''):c?`${c} service${c===1?'':'s'}`:''};
+function drawFilter(){
+  const box=$('#tnBody'),st=box.scrollTop,sx={};box.querySelectorAll('.tgs.hs').forEach(r=>sx[r.dataset.row]=r.scrollLeft);
+  const ready=cfg.region&&myServices().length;$('#fClear').disabled=!fCount();
+  const ch=(k,v,l)=>`<button class="tog${flt[k]===v?' on':''}" data-fk="${k}" data-fv="${esc(v)}">${esc(l)}</button>`;
+  const row=(t,k,opts,sc)=>`<div class="lbl"><span>${t}</span></div><div class="tgs${sc?' hs':''}" data-row="${k}">${opts.map(([v,l])=>ch(k,v,l)).join('')}</div>`;
+  box.innerHTML=row('Mood','mood',Object.entries(MOODS).map(([k,m])=>[k,m.n]))+
+    row('Type','type',TYPES)+(flt.type==='series'?'':row('Length','len',LENS))+
+    row('Genre','g',[['','Any'],...TAX.map(g=>[g.id,g.n])],true)+
+    (flt.g?row('Subcategory','s',[['','Any'],...GEN[flt.g].subs.map(s=>[s,SUB[s].l])],true):'')+
+    row('Year','dec',DECS)+row('Minimum rating','rate',RATES)+
+    `<div class="dtog"><label><input type="checkbox" id="fStream"${streamOn()?' checked':''}${ready?'':' disabled'}><span>Only on my services</span></label><button class="edl" data-gostream>${ready?esc(svcSummary())+' ›':'Set up ›'}</button></div>`;
+  box.scrollTop=st;box.querySelectorAll('.tgs.hs').forEach(r=>{if(sx[r.dataset.row]!=null)r.scrollLeft=sx[r.dataset.row]})}
+$('#tnBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-fk]');if(b){const k=b.dataset.fk;let v=b.dataset.fv;if(flt[k]===v&&v!==F0[k])v=F0[k];flt[k]=v;
+    if(k==='g')flt.s='';if(k==='type'&&v==='series')flt.len='any';filtersChanged();return}
+  if(e.target.closest('[data-gostream]'))openStream()});
+$('#tnBody').addEventListener('change',e=>{if(e.target.id!=='fStream')return;cfg.streamOnly=e.target.checked;saveCfg();filtersChanged()});
+$('#fClear').addEventListener('click',clearFilters);
+
+/* ---------- Pick one (Queue tab) ---------- */
+let pkPool=[],pkI=0;
+function openPick(){pkPool=listOrder.slice().sort(()=>Math.random()-.5);pkI=0;drawPick();open('shPick')}
+function drawPick(){const box=$('#pkBody'),t=pkPool[pkI];
+  if(!t){box.innerHTML='<div class="msg">Nothing in your Queue to pick from.</div>';return}
+  const meta=[t.year,kindL(t.kind),t.kind==='film'&&t.runtime?t.runtime+' min':'',t.imdbRating?'IMDb '+t.imdbRating.toFixed(1):''].filter(Boolean).join(' · ');
+  box.innerHTML=`<div class="tres">${poster(t,'w342')}<div><span class="tcount">${pkI+1} / ${pkPool.length}</span><h3>${esc(t.title)}</h3><p class="mt">${esc(meta)}</p><p class="why2" id="pkWhy"></p><p class="syn">${esc(t.synopsis||'')}</p></div></div>
+    <div class="shrow"><button class="btn line" id="pkNext"${pkPool.length>1?'':' disabled'}>Another</button><button class="btn ink" id="pkOpen">Open</button></div>`;
+  if(t.tmdb&&cfg.region)provFor(t.kind==='series'?'tv':'movie',t.tmdb).then(v=>{const el=$('#pkWhy');if(!el||pkPool[pkI]!==t||!v)return;const s=myServices(),mine=v.s.filter(x=>s.includes(x.id));
+    if(mine.length)el.innerHTML=`On your <b>${esc(mine.map(x=>x.n).join(', '))}</b>`}).catch(()=>{})}
+$('#pkBody').addEventListener('click',e=>{
+  if(e.target.id==='pkNext'){pkI=(pkI+1)%pkPool.length;drawPick();return}
+  if(e.target.id==='pkOpen'){const t=pkPool[pkI];if(!t)return;close('shPick');selectItem(t)}});
+
+/* ---------- Streaming screen ---------- */
+const SVJ=/\b(kids|store|channel)\b|with ads|justwatch|^amazon video$|^google play|^microsoft|^youtube$|^rakuten tv$|^path[eé] thuis$|^chili$|^vudu|^fandango/i;
+const svNorm=n=>String(n).toLowerCase().replace(/\s+(standard\s+|basic\s+)?with ads$/,'').replace(/\s+kids$/,'').trim();
+const myNames=()=>(cfg.services||[]).map(id=>(cfg.svcNames||{})[id]).filter(Boolean);
+const svcMemo={};
+async function svcList(){const r=cfg.region;if(!svcMemo[r])svcMemo[r]=regionServices().catch(e=>{delete svcMemo[r];throw e});return svcMemo[r]}
+let stAll=false;
+function openStream(){stAll=false;$('#svQ').value='';open('shStream');drawStream(true)}
+function streamLine(){const el=$('#sStreamT');if(!el)return;el.textContent=cfg.region?regionName(cfg.region)+((cfg.services||[]).length?' · '+svcSummary():' · no services chosen'):'Choose your country'}
+async function drawStream(fillSel){
+  if(fillSel){const sel=$('#sReg');try{const L=await loadRegions();sel.innerHTML='<option value="">Choose…</option>'+L.map(r=>`<option value="${r.c}"${r.c===cfg.region?' selected':''}>${esc(r.n)}</option>`).join('')}
+    catch(e){sel.innerHTML=`<option value="${esc(cfg.region||'')}">${esc(cfg.region?regionName(cfg.region):'Choose…')}</option>`}}
+  const box=$('#sSvc');$('#svQ').hidden=!cfg.region;if(!cfg.region){box.innerHTML='<p class="pvnote">Choose your country to pick your services.</p>';return}
+  if(!box.children.length||fillSel)box.innerHTML='<div class="load"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
+  let L;try{L=await svcList()}catch(e){box.innerHTML=`<p class="pvnote">${ERR[e&&e.code]||ERR.http}</p>`;return}
+  const s=cfg.services||[],q=$('#svQ').value.trim().toLowerCase();
+  const chip=p=>`<button type="button" class="${s.includes(p.id)?'on':''}${p.l?'':' t'}" data-sv="${p.id}">${p.l?`<img src="${esc(imgSrc(p.l,'w92'))}" alt="" loading="lazy">`:''}${esc(p.n)}</button>`;
+  const sec=(t,ps)=>`<div class="lbl"><span>${t}</span></div><div class="svc">${ps.map(chip).join('')}</div>`;
+  if(q){const m=L.filter(p=>p.n.toLowerCase().includes(q));box.innerHTML=m.length?sec('Results',m):'<p class="pvnote">No service by that name here.</p>';return}
+  const mine=L.filter(p=>s.includes(p.id)),rest=L.filter(p=>!s.includes(p.id)&&!SVJ.test(p.n));
+  box.innerHTML=(mine.length?sec('Yours',mine):'<div class="lbl"><span>Yours</span></div><p class="pvnote">None yet. Tap the services you pay for.</p>')+
+    sec(stAll?'All services':'Popular',stAll?rest:rest.slice(0,12))+(!stAll&&rest.length>12?`<button class="btn line sm stall" data-stall>Show all ›</button>`:'')}
+async function toggleSvc(id){
+  let L=[];try{L=await svcList()}catch(e){}
+  const p=L.find(x=>x.id===id),s=cfg.services||[];cfg.services=s.includes(id)?s.filter(x=>x!==id):[...s,id];
+  cfg.svcNames={...(cfg.svcNames||{})};if(p)cfg.svcNames[id]=p.n;
+  const names=new Set(cfg.services.map(i=>svNorm(cfg.svcNames[i]||'')).filter(Boolean));
+  cfg.svcVar=L.filter(x=>!cfg.services.includes(x.id)&&names.has(svNorm(x.n))).map(x=>x.id);
+  saveCfg();afterStream()}
+function afterStream(){streamLine();homeReset();drawPills();if(cur){drawWatch();loadWatch()}}
+$('#sSvc').addEventListener('click',e=>{const b=e.target.closest('[data-sv]');if(b){toggleSvc(+b.dataset.sv).then(()=>drawStream());return}
+  if(e.target.closest('[data-stall]')){stAll=true;drawStream()}});
+$('#sReg').addEventListener('change',e=>{cfg.region=e.target.value;saveCfg();stAll=false;drawStream();
+  svcList().then(L=>{const names=new Set((cfg.services||[]).map(i=>svNorm((cfg.svcNames||{})[i]||'')).filter(Boolean));cfg.svcVar=L.filter(x=>!cfg.services.includes(x.id)&&names.has(svNorm(x.n))).map(x=>x.id);saveCfg();afterStream()}).catch(()=>afterStream())});
+let svqT;$('#svQ').addEventListener('input',()=>{clearTimeout(svqT);svqT=setTimeout(()=>drawStream(),120)});
+$('#bStream').addEventListener('click',openStream);
+/* names for services chosen in 0.0.10, which only stored ids */
+setTimeout(()=>{if(!((cfg.services||[]).some(id=>!(cfg.svcNames||{})[id])&&cfg.region))return;svcList().then(L=>{cfg.svcNames={...(cfg.svcNames||{})};L.forEach(p=>{if(cfg.services.includes(p.id))cfg.svcNames[p.id]=p.n});saveCfg();streamLine();drawPills();if($('#shFilter').classList.contains('open'))drawFilter()}).catch(()=>{})},1500);
 
 /* ---------- Taste profile ---------- */
 function openTaste(){drawTaste();open('shTaste')}
@@ -1503,7 +1595,7 @@ function renderEd(){
   $('#eScore').innerHTML=cur.rating?`${cur.rating}<small>/10</small>`:'<small>tap a dot</small>';
   document.querySelectorAll('#eStat button').forEach(b=>b.classList.toggle('on',b.dataset.s===cur.status));
   $('#eDate').value=cur.date||'';$('#eDate').hidden=cur.status==='want';
-  $('#eProg').innerHTML=progHTML();drawWatch();
+  drawWatch();
   const chips=[];cur.genres.forEach(g=>{if(!GEN[g])return;chips.push(`<span class="chip g">${GEN[g].n}</span>`);cur.subs.filter(s=>SUB[s]&&SUB[s].g===g).forEach(s=>chips.push(`<span class="chip">${esc(SUB[s].l)}</span>`))});
   $('#eCats').innerHTML=chips.join('')+`<span class="chip add2">${chips.length?'Edit':'+ Add categories'}</span>`;
   $('#eImdb').href=cur.imdb?'https://www.imdb.com/title/'+encodeURIComponent(cur.imdb)+'/':'https://www.imdb.com/find/?q='+encodeURIComponent([cur.title,cur.year].filter(Boolean).join(' '))}
@@ -1512,9 +1604,7 @@ $('#eStat').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if
 $('#eDate').addEventListener('change',e=>{cur.date=e.target.value});
 $('#eHero').addEventListener('click',e=>{if(e.target.id==='eSyn')e.target.classList.toggle('full');if(e.target.id==='bDet')openDet();
   const pn=e.target.closest('.pn');if(pn)openPerson(pn);if(e.target.closest('[data-coll]'))openColl()});
-$('#eWatch').addEventListener('click',e=>{if(e.target.closest('[data-goset]'))openSet()});
-$('#eProg').addEventListener('click',e=>{const b=e.target.closest('[data-pg]');if(b)progStep(b.dataset.pg==='next'?1:-1)});
-$('#eProg').addEventListener('change',e=>{if(e.target.id==='pgS'){cur.prog={s:+e.target.value,e:0};renderEd()}});
+$('#eWatch').addEventListener('click',e=>{if(e.target.closest('[data-goset]'))openStream()});
 let xArm=false,dArm=false;
 function armX(v){xArm=v;$('#bEdX').textContent=v?'Discard changes?':'Close';$('#bEdX').style.color=v?'var(--red)':''}
 function armDel(v){dArm=v;$('#bDel').textContent=v?'Tap again to delete':'Delete';$('#bDel').classList.toggle('arm',v)}
@@ -1558,20 +1648,7 @@ $('#bDetOk').addEventListener('click',()=>{
 
 /* ---------- settings ---------- */
 function hidMsg(){const n=(cfg.hidden||[]).length;$('#sHid').textContent=n?`${n} suggestion${n===1?'':'s'} hidden from Discover (× in For you, or swiped left).`:'No hidden suggestions.';$('#bResHid').disabled=!n}
-async function fillStreamSettings(){
-  const sel=$('#sReg');
-  try{const L=await loadRegions();sel.innerHTML='<option value="">Choose…</option>'+L.map(r=>`<option value="${r.c}"${r.c===cfg.region?' selected':''}>${esc(r.n)}</option>`).join('')}
-  catch(e){sel.innerHTML=`<option value="${esc(cfg.region||'')}">${esc(cfg.region?regionName(cfg.region):'Choose…')}</option>`}
-  drawServices()}
-async function drawServices(){const box=$('#sSvc');if(!cfg.region){box.innerHTML='<span class="pvnote">Choose a country first.</span>';return}
-  box.innerHTML='<span class="pvnote">Loading…</span>';
-  try{const L=await regionServices(),s=myServices();
-    box.innerHTML=L.map(p=>`<button type="button" class="${s.includes(p.id)?'on':''}${p.l?'':' t'}" data-sv="${p.id}">${p.l?`<img src="${esc(imgSrc(p.l,'w92'))}" alt="">`:''}${esc(p.n)}</button>`).join('')}
-  catch(e){box.innerHTML=`<span class="pvnote">${ERR[e&&e.code]||ERR.http}</span>`}}
-$('#sReg').addEventListener('change',e=>{cfg.region=e.target.value;saveCfg();drawServices();if(typeof homeReset==='function')homeReset();if(cur){drawWatch();loadWatch()}});
-$('#sSvc').addEventListener('click',e=>{const b=e.target.closest('[data-sv]');if(!b)return;const id=+b.dataset.sv,s=myServices();
-  cfg.services=s.includes(id)?s.filter(x=>x!==id):[...s,id];saveCfg();b.classList.toggle('on',cfg.services.includes(id));if(typeof homeReset==='function')homeReset();if(cur)drawWatch()});
-function openSet(){hidMsg();fillStreamSettings();$('#rWarn').hidden=true;$('#bResAll').hidden=false;$('#sVer').textContent='Watchlog \u00b7 '+VERSION;$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$('#sOmdbMsg').textContent='';$('#sKeyMsg').textContent='';$('#sKeyMsg').className='';
+function openSet(){hidMsg();streamLine();$('#rWarn').hidden=true;$('#bResAll').hidden=false;$('#sVer').textContent='Watchlog \u00b7 '+VERSION;$('#sKey').value=cfg.key||'';$('#sOmdb').value=cfg.omdb||'';$('#sOmdbMsg').textContent='';$('#sKeyMsg').textContent='';$('#sKeyMsg').className='';
   document.querySelectorAll('#sPost button').forEach(b=>b.classList.toggle('on',b.dataset.p===cfg.posters));
   $('#sGh').value=cfg.gh||'';syncMsg();$('#sCount').textContent=`${items.length} title${items.length===1?'':'s'} stored on this phone. Export saves a file to Downloads; Import reads one back.`;open('shSet')}
 $('#bSet').addEventListener('click',openSet);
