@@ -1,5 +1,5 @@
-// Watchlog alpha 0.0.5 — service worker: keeps the app usable offline.
-const SHELL = 'watchlog-shell-alpha-0.0.5'; // bump with every release
+// Watchlog alpha 0.0.6 — service worker: keeps the app usable offline.
+const SHELL = 'watchlog-shell-alpha-0.0.6'; // bump with every release
 const RUNTIME = 'watchlog-runtime-v1';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable.png'];
 
